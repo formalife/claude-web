@@ -1,0 +1,247 @@
+/*
+ * Guida Anti-Panico al Soffocamento Pediatrico — CSS pagine legali (v3.2)
+ * Condizioni di vendita e Privacy condividono le variabili, i font e i
+ * componenti di base definiti in frontend.css (caricato prima di questo
+ * foglio, vedi class-gaps-assets.php). Qui vengono definiti solo gli
+ * elementi specifici della lettura di un testo lungo: intestazione,
+ * indice, sezioni numerate, richiami, tabelle.
+ * Tutte le classi sono prefissate "gaps-legal-" e annidate sotto
+ * ".gaps-legal-page" per evitare conflitti con il tema attivo.
+ */
+
+html:has(.gaps-legal-page) { scroll-behavior: smooth; }
+
+/* ===== TOPBAR (link di ritorno alla landing) ===== */
+.gaps-legal-topbar-link {
+	color: #fff;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+.gaps-legal-topbar-link:hover { color: var(--gaps-cream-warm); text-decoration: underline; }
+
+/* ===== HEADER ===== */
+.gaps-legal-header {
+	background: linear-gradient(160deg, var(--gaps-teal-deep) 0%, var(--gaps-teal-darker) 100%);
+	color: #fff;
+	padding: 64px 0 56px;
+	text-align: center;
+}
+.gaps-legal-header .gaps-eyebrow {
+	background: rgba(255,255,255,0.16);
+	color: #fff;
+}
+.gaps-legal-header h1 {
+	color: #fff;
+	font-size: clamp(1.9rem, 3.6vw, 2.6rem);
+	margin: 14px 0 12px;
+}
+.gaps-legal-updated {
+	color: rgba(255,255,255,0.85);
+	font-size: 0.92rem;
+}
+
+/* ===== CORPO DEL TESTO ===== */
+.gaps-legal-page { background: var(--gaps-cream); }
+.gaps-legal-body-wrap {
+	max-width: 760px;
+	padding-top: 56px;
+	padding-bottom: 24px;
+}
+
+.gaps-legal-intro {
+	font-family: var(--gaps-font-story);
+	font-size: 1.1rem;
+	color: var(--gaps-ink-soft);
+	line-height: 1.75;
+	margin-bottom: 40px;
+}
+
+/* Indice */
+.gaps-legal-toc {
+	background: var(--gaps-white);
+	border-radius: var(--gaps-radius);
+	box-shadow: var(--gaps-shadow-soft);
+	padding: 28px 30px;
+	margin-bottom: 52px;
+}
+.gaps-legal-toc h2 {
+	font-size: 1.05rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--gaps-teal-bright);
+	margin-bottom: 16px;
+}
+.gaps-legal-toc ol {
+	list-style: none;
+	counter-reset: gaps-toc;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px 24px;
+}
+.gaps-legal-toc li { counter-increment: gaps-toc; }
+.gaps-legal-toc a {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	text-decoration: none;
+	color: var(--gaps-ink);
+	font-size: 0.94rem;
+	padding: 4px 0;
+	transition: color 0.15s ease;
+}
+.gaps-legal-toc a::before {
+	content: counter(gaps-toc);
+	flex-shrink: 0;
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	background: rgba(44,173,169,0.14);
+	color: var(--gaps-teal-deep);
+	font-size: 0.72rem;
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.gaps-legal-toc a:hover { color: var(--gaps-teal-deep); text-decoration: underline; }
+@media (max-width: 640px) { .gaps-legal-toc ol { grid-template-columns: 1fr; } }
+
+/* Sezioni */
+.gaps-legal-section { margin-bottom: 44px; scroll-margin-top: 24px; }
+.gaps-legal-section h2 {
+	font-size: 1.35rem;
+	color: var(--gaps-teal-deep);
+	margin-bottom: 16px;
+	padding-bottom: 10px;
+	border-bottom: 2px solid var(--gaps-border-soft);
+	display: flex;
+	align-items: baseline;
+	gap: 12px;
+}
+.gaps-legal-section h2 .gaps-legal-num {
+	font-family: var(--gaps-font-display);
+	color: var(--gaps-teal-bright);
+	font-size: 1rem;
+}
+.gaps-legal-section h3 {
+	font-size: 1.08rem;
+	color: var(--gaps-ink);
+	margin: 22px 0 10px;
+}
+.gaps-legal-section p,
+.gaps-legal-section li {
+	color: var(--gaps-ink-soft);
+	font-size: 0.99rem;
+	line-height: 1.8;
+	margin-bottom: 14px;
+}
+.gaps-legal-section ul,
+.gaps-legal-section ol.gaps-legal-list {
+	margin: 0 0 18px 22px;
+}
+.gaps-legal-section ol.gaps-legal-list { list-style: decimal; }
+.gaps-legal-section strong { color: var(--gaps-ink); }
+.gaps-legal-section a { color: var(--gaps-teal-deep); text-decoration: underline; }
+
+/* Richiamo evidenziato (diritti chiave, scadenze, garanzie) */
+.gaps-legal-callout {
+	background: linear-gradient(135deg, var(--gaps-teal-deep), var(--gaps-teal-darker));
+	color: #fff;
+	border-radius: var(--gaps-radius-sm);
+	padding: 24px 28px;
+	margin: 18px 0 22px;
+	box-shadow: var(--gaps-shadow-card);
+}
+.gaps-legal-callout p,
+.gaps-legal-callout li { color: rgba(255,255,255,0.95); margin-bottom: 8px; }
+.gaps-legal-callout p:last-child,
+.gaps-legal-callout li:last-child { margin-bottom: 0; }
+.gaps-legal-callout strong { color: var(--gaps-cream-warm); }
+
+/* Avviso (limitazioni, eccezioni, cautele) */
+.gaps-legal-note {
+	background: rgba(194,78,58,0.08);
+	border-left: 4px solid var(--gaps-terracotta);
+	border-radius: 0 var(--gaps-radius-sm) var(--gaps-radius-sm) 0;
+	padding: 18px 22px;
+	margin: 18px 0 22px;
+}
+.gaps-legal-note p,
+.gaps-legal-note li { color: var(--gaps-ink-soft); margin-bottom: 8px; }
+.gaps-legal-note p:last-child { margin-bottom: 0; }
+.gaps-legal-note strong { color: var(--gaps-terracotta); }
+
+/* Tabella (es. categorie di dati / finalità / conservazione) */
+.gaps-legal-table-wrap {
+	overflow-x: auto;
+	margin: 8px 0 22px;
+	border-radius: var(--gaps-radius-sm);
+	box-shadow: var(--gaps-shadow-soft);
+}
+table.gaps-legal-table {
+	width: 100%;
+	border-collapse: collapse;
+	background: var(--gaps-white);
+	font-size: 0.92rem;
+}
+table.gaps-legal-table th,
+table.gaps-legal-table td {
+	text-align: left;
+	padding: 12px 16px;
+	border-bottom: 1px solid var(--gaps-border-soft);
+	vertical-align: top;
+	color: var(--gaps-ink-soft);
+}
+table.gaps-legal-table th {
+	background: rgba(44,173,169,0.1);
+	color: var(--gaps-teal-deep);
+	font-family: var(--gaps-font-display);
+	font-weight: 600;
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+table.gaps-legal-table tr:last-child td { border-bottom: none; }
+
+/* Segnaposto dati legali non ancora compilati */
+mark.gaps-legal-todo {
+	background: #FCE9A8;
+	color: var(--gaps-ink);
+	padding: 1px 6px;
+	border-radius: 4px;
+	font-weight: 600;
+	cursor: help;
+	border-bottom: 2px dashed var(--gaps-terracotta);
+}
+
+/* Contatti azienda in chiusura (riepilogo dati) */
+.gaps-legal-company-box {
+	background: var(--gaps-white);
+	border-radius: var(--gaps-radius-sm);
+	box-shadow: var(--gaps-shadow-soft);
+	padding: 22px 26px;
+	margin: 8px 0 22px;
+}
+.gaps-legal-company-box p { margin-bottom: 6px; font-size: 0.94rem; }
+.gaps-legal-company-box p:last-child { margin-bottom: 0; }
+
+/* CTA di chiusura pagina */
+.gaps-legal-cta {
+	background: var(--gaps-white);
+	text-align: center;
+	padding: 48px 0;
+	border-top: 1px solid var(--gaps-border-soft);
+}
+.gaps-legal-cta p {
+	color: var(--gaps-ink-soft);
+	margin-bottom: 18px;
+	font-size: 1.05rem;
+}
+
+@media (max-width: 640px) {
+	.gaps-legal-header { padding: 48px 0 40px; }
+	.gaps-legal-body-wrap { padding-top: 40px; }
+	.gaps-legal-toc { padding: 22px 20px; }
+}

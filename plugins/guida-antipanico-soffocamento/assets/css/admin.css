@@ -1,0 +1,52 @@
+.gaps-settings-wrap .title {
+	margin-top: 32px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #dcdcde;
+}
+
+.gaps-settings-wrap .notice.inline {
+	margin: 16px 0;
+}
+
+.gaps-image-field .gaps-image-preview {
+	max-width: 220px;
+	min-height: 60px;
+	margin-bottom: 10px;
+}
+
+.gaps-image-field .gaps-image-preview img {
+	max-width: 220px;
+	height: auto;
+	display: block;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #f0f0f1;
+}
+
+.gaps-image-field .button {
+	margin-right: 8px;
+}
+
+.gaps-webp-hint {
+	max-width: 460px;
+	margin: 6px 0 10px;
+	padding: 8px 12px;
+	border-left: 3px solid #dba617;
+	background: #fff8e5;
+	color: #664d03;
+	font-size: 12.5px;
+}
+
+.gaps-file-field .gaps-file-preview {
+	min-height: 24px;
+	margin-bottom: 10px;
+	font-size: 13px;
+}
+
+.gaps-file-field .button {
+	margin-right: 8px;
+}
+
+.gaps-settings-wrap .form-table th {
+	width: 260px;
+}

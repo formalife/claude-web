@@ -1,0 +1,96 @@
+/*
+ * Guida Anti-Panico al Soffocamento Pediatrico — dichiarazioni @font-face locali.
+ *
+ * Sostituisce il precedente enqueue di Google Fonts (fonts.googleapis.com /
+ * fonts.gstatic.com): nessuna richiesta esterna per i font, nessun @import.
+ * I file WOFF2 referenziati qui sotto NON sono inclusi automaticamente nel
+ * repository — vanno copiati manualmente in assets/fonts/ (vedi
+ * assets/fonts/README.txt per l'elenco completo e il ruolo di ciascun peso).
+ *
+ * Solo i pesi realmente usati nel CSS del plugin sono dichiarati qui
+ * (Fredoka 500 e Karla 500, presenti nella vecchia richiesta Google Fonts,
+ * non sono mai referenziati da nessuna regola e sono stati rimossi).
+ *
+ * font-display: optional per tutti i pesi: se il file locale non è
+ * disponibile in tempo per il primo rendering (o non è ancora stato
+ * copiato in assets/fonts/), il browser usa direttamente il fallback di
+ * sistema e NON esegue più lo swap in un secondo momento — questo è ciò
+ * che elimina lo spostamento tardivo del testo della Hero (CLS da font).
+ */
+
+@font-face {
+	font-family: "Fredoka";
+	src: url("../fonts/fredoka-600.woff2") format("woff2");
+	font-weight: 600;
+	font-style: normal;
+	font-display: optional;
+}
+
+@font-face {
+	font-family: "Fredoka";
+	src: url("../fonts/fredoka-700.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: optional;
+}
+
+@font-face {
+	font-family: "Karla";
+	src: url("../fonts/karla-400.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: optional;
+}
+
+@font-face {
+	font-family: "Karla";
+	src: url("../fonts/karla-600.woff2") format("woff2");
+	font-weight: 600;
+	font-style: normal;
+	font-display: optional;
+}
+
+@font-face {
+	font-family: "Karla";
+	src: url("../fonts/karla-700.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: optional;
+}
+
+@font-face {
+	font-family: "Lora";
+	src: url("../fonts/lora-400.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: optional;
+}
+
+@font-face {
+	font-family: "Lora";
+	src: url("../fonts/lora-400-italic.woff2") format("woff2");
+	font-weight: 400;
+	font-style: italic;
+	font-display: optional;
+}
+
+@font-face {
+	font-family: "Lora";
+	src: url("../fonts/lora-700.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: optional;
+}
+
+/*
+ * Nota sulle metriche di fallback (size-adjust / ascent-override /
+ * descent-override / line-gap-override): non sono state impostate qui.
+ * Calcolarle correttamente richiede di analizzare i file WOFF2 reali (con
+ * uno strumento come fontTools/Capsize) — che non sono presenti in questo
+ * repository. Impostare valori inventati sarebbe peggio che non impostarli
+ * affatto (potrebbe introdurre proprio lo spostamento di layout che
+ * dovrebbero prevenire). Con font-display: optional come protezione
+ * primaria, il rischio di CLS resta comunque minimo: se i file sopra
+ * vengono aggiunti in assets/fonts/, calcolare le metriche corrette è
+ * un miglioramento ulteriore consigliato ma non bloccante.
+ */
