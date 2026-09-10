@@ -1,0 +1,1630 @@
+/*
+ * Corso Anti-Panico al Soffocamento Pediatrico — CSS landing (v5.1.0)
+ *
+ * Stessa grammatica visiva del plugin "Guida Anti-Panico al Soffocamento
+ * Pediatrico" e di Formalife Home: token --fmh-*, raggi, ombre, tipografia
+ * e ritmo delle sezioni identici.
+ *
+ * NOTE DI ARCHITETTURA (importanti per capire perché certe regole esistono):
+ *
+ * 1. ".fmh-course-page" non discende da ".fmh-home"/".fmh-nav", quindi non
+ *    eredita né i token --fmh-* né il reset dichiarati in frontend.css:
+ *    entrambi vanno ridichiarati qui. Il reset (margin/padding a zero) era
+ *    assente nelle versioni precedenti ed è la ragione per cui le spaziature
+ *    risultavano raddoppiate e le griglie <ol>/<ul> rientrate di 40px.
+ *
+ * 2. Modale di checkout, CTA sticky e pagina di ringraziamento stanno FUORI
+ *    da <main class="fmh-course-page">: ricevono token e reset dedicati,
+ *    così non devono più dipendere dai valori di fallback var(--x, …).
+ *
+ * 3. fmh_render_image() emette <div class="fmh-placeholder">, non
+ *    ".fmh-course-placeholder": entrambe le classi sono stilizzate qui, così
+ *    gli slot immagine ancora vuoti mantengono le proporzioni corrette.
+ *
+ * 4. Gli hook JS (ID del checkout, .fmh-course-open-checkout, attributo
+ *    [hidden], .is-visible) non sono mai toccati: questo foglio è puramente
+ *    estetico.
+ *
+ * 5. v4.6.4: i token realmente condivisi con formalife-core (font, raggi,
+ *    larghezza massima, ink/white, i tre colori "libro") sono ora alias
+ *    var(--fmls-*, <valore originale>) — un solo posto definisce quei
+ *    valori, con fallback esplicito se formalife-core non fosse attivo. La
+ *    palette propria (blu/rosso/verde/crema e le ombre/bordi calcolati su
+ *    di essa) resta scritta qui, deliberatamente indipendente.
+ */
+
+/* =====================================================================
+   TOKEN — condivisi da landing, modale, CTA sticky e thank-you page
+   ===================================================================== */
+.fmh-course-page,
+.fmh-course-modal,
+.fmh-mobile-cta,
+.fmh-course-thankyou {
+	--fmh-cream: #FBF8F4;
+	--fmh-cream-alt: #F4EDE3;
+	--fmh-blue-deep: #1E3A5F;
+	--fmh-blue-darker: #142843;
+	--fmh-blue-light: #EEF3F9;
+	--fmh-red: #C94A4A;
+	--fmh-red-dark: #A33535;
+	--fmh-red-light: #FAEAEA;
+	--fmh-green: #2E7D5B;
+	--fmh-green-dark: #1F5C41;
+	--fmh-green-light: #E6F4EC;
+	--fmh-ink: var(--fmls-ink, #1A1A1A);
+	--fmh-ink-soft: var(--fmls-ink-soft, #3A3A3A);
+	--fmh-white: var(--fmls-white, #FFFFFF);
+	--fmh-border-soft: rgba(30,58,95,0.15);
+	--fmh-shadow-soft: 0 4px 20px rgba(30,58,95,0.08);
+	--fmh-shadow-card: 0 8px 30px rgba(30,58,95,0.12);
+	--fmh-shadow-lift: 0 18px 46px rgba(30,58,95,0.18);
+	--fmh-radius: var(--fmls-radius, 20px);
+	--fmh-radius-sm: var(--fmls-radius-sm, 12px);
+	--fmh-max-w: var(--fmls-max-w, 1120px);
+
+	/* Stack identici a quelli del plugin del libro: senza i WOFF2 locali
+	   (font-display: optional) il fallback resta arrotondato e coerente,
+	   invece di ricadere sul system-ui del sistema operativo. */
+	--fmh-font-display: var(--fmls-font-display, 'Fredoka', 'Arial Rounded MT Bold', Arial, sans-serif);
+	--fmh-font-body: var(--fmls-font-body, 'Karla', Arial, sans-serif);
+	--fmh-font-story: var(--fmls-font-story, 'Lora', Georgia, serif);
+
+	/* Eccezione cromatica: colori del plugin del libro, usati solo nella
+	   sezione 9 ("Il libro"), esattamente come sull'home — ora aliasati ai
+	   token condivisi di formalife-core. */
+	--fmh-book-teal: var(--fmls-teal-deep, #0B6560);
+	--fmh-book-teal-darker: var(--fmls-teal-darker, #084F4B);
+	--fmh-book-terracotta: var(--fmls-terracotta, #C24E3A);
+
+	/* Overlay e punto focale di hero e chiusura: valorizzati da FMH_Assets
+	   con uno stile inline, questi sono solo i valori di partenza. */
+	--fmh-hero-focal-x: 50%;
+	--fmh-hero-focal-y: 50%;
+	--fmh-hero-blur: 0px;
+	--fmh-hero-overlay: rgba(20,40,67,.28);
+	--fmh-final-focal-x: 50%;
+	--fmh-final-focal-y: 50%;
+	--fmh-final-blur: 0px;
+	--fmh-final-overlay: rgba(12,40,67,.78);
+	--fmh-final-image: none;
+}
+
+/* =====================================================================
+   RESET — allineato a quello di .fmh-home in frontend.css
+   ===================================================================== */
+.fmh-course-page, .fmh-course-page *, .fmh-course-page *::before, .fmh-course-page *::after,
+.fmh-course-modal, .fmh-course-modal *, .fmh-course-modal *::before, .fmh-course-modal *::after,
+.fmh-mobile-cta, .fmh-mobile-cta *,
+.fmh-course-thankyou, .fmh-course-thankyou * {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+/* Il reset non deve mai rendere visibile ciò che il JS nasconde con
+   l'attributo [hidden] (pannelli del checkout, campi fattura, ecc.). */
+.fmh-course-page [hidden],
+.fmh-course-modal[hidden],
+.fmh-course-modal [hidden],
+.fmh-mobile-cta[hidden] { display: none !important; }
+
+/* Il reset qui sopra ha la stessa specificità (una classe) delle regole di
+   frontend.css e viene caricato dopo: azzererebbe quindi il padding dei
+   componenti condivisi. Vanno ridichiarati, con gli stessi valori
+   dell'originale, così restano identici a quelli della home. */
+.fmh-course-page .fmh-wrap { max-width: var(--fmh-max-w); margin: 0 auto; padding: 0 24px; }
+.fmh-course-page .fmh-eyebrow { padding: 6px 14px; }
+.fmh-course-page .fmh-date-badge { padding: 8px 16px; }
+.fmh-course-page .fmh-btn-primary,
+.fmh-course-modal .fmh-btn-primary,
+.fmh-course-thankyou .fmh-btn-primary { padding: 17px 28px; }
+.fmh-course-page .fmh-eyebrow-center { display: table; margin-left: auto; margin-right: auto; }
+
+body.fmh-course-body,
+body.fmh-course-thankyou-body { margin: 0; background: #FBF8F4; }
+body.fmh-modal-open { overflow: hidden; }
+
+.fmh-course-page {
+	font-family: var(--fmh-font-body);
+	background: var(--fmh-cream);
+	color: var(--fmh-ink);
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+	overflow-x: hidden;
+}
+.fmh-course-page img { max-width: 100%; height: auto; display: block; }
+.fmh-course-page a { text-decoration: none; color: inherit; }
+.fmh-course-page button { font: inherit; }
+
+/* "color: inherit" qui sopra ha specificità (0,1,1) e batteva il colore
+   dichiarato dai componenti in frontend.css (0,1,0): tutte le CTA rese come
+   <a> uscivano con il testo scuro su fondo rosso, quindi illeggibile.
+   I <button> non erano interessati, perché non ereditano il colore.
+   Qui il colore corretto viene riaffermato con specificità sufficiente. */
+.fmh-course-page a.fmh-btn-primary,
+.fmh-course-page a.fmh-btn-primary:hover,
+.fmh-course-page a.fmh-btn-primary:focus-visible,
+.fmh-course-page button.fmh-btn-primary,
+.fmh-course-modal a.fmh-btn-primary,
+.fmh-course-thankyou a.fmh-btn-primary { color: #FFFFFF; }
+
+.fmh-course-page a.fmh-text-link { color: var(--fmh-blue-deep); }
+.fmh-course-page a.fmh-text-link:hover,
+.fmh-course-page a.fmh-text-link:focus-visible { color: var(--fmh-red-dark); }
+.fmh-course-page ul, .fmh-course-page ol { list-style: none; }
+
+/* Offset di ancoraggio: la barra di navigazione è sticky, quindi lo scroll
+   verso #sessioni/#faq/#metodo deve fermarsi sotto di essa. */
+.fmh-course-page section { scroll-margin-top: 88px; }
+.fmh-course-page > section { padding: 88px 0; position: relative; }
+
+/* =====================================================================
+   TIPOGRAFIA
+   ===================================================================== */
+.fmh-course-page h1,
+.fmh-course-page h2,
+.fmh-course-page h3 {
+	font-family: var(--fmh-font-display);
+	color: var(--fmh-blue-deep);
+	line-height: 1.15;
+	font-weight: 600;
+	text-wrap: balance;
+}
+.fmh-course-page h1 { font-size: clamp(2.15rem, 4vw, 3.15rem); letter-spacing: -0.015em; }
+.fmh-course-page h2 { font-size: clamp(1.72rem, 3vw, 2.5rem); letter-spacing: -0.01em; }
+.fmh-course-page h3 { font-size: 1.25rem; }
+.fmh-course-page p { color: var(--fmh-ink-soft); }
+
+/* Blocco "intestazione di sezione": occhiello, titolo, sottotitolo.
+   Ripristina il ritmo verticale che prima dipendeva dai margini di default
+   del browser e ora è dichiarato esplicitamente. */
+.fmh-course-page > section > .fmh-wrap > h2 { margin-bottom: 16px; }
+.fmh-course-page > section > .fmh-wrap > h2:last-child { margin-bottom: 0; }
+.fmh-course-page .fmh-eyebrow { margin-bottom: 18px; }
+
+.fmh-narrow { max-width: 760px; margin: 0 auto; text-align: center; }
+
+/* Placeholder degli slot immagine ancora vuoti in bacheca.
+   fmh_render_image() emette ".fmh-placeholder"; ".fmh-course-placeholder"
+   resta supportata per compatibilità. */
+.fmh-course-page .fmh-placeholder,
+.fmh-course-page .fmh-course-placeholder {
+	display: grid;
+	place-items: center;
+	width: 100%;
+	background: linear-gradient(135deg, rgba(30,58,95,.09), rgba(30,58,95,.03));
+	border: 1px dashed var(--fmh-border-soft);
+	border-radius: var(--fmh-radius-sm);
+	color: var(--fmh-ink-soft);
+	font-size: .8rem;
+	font-weight: 600;
+	text-align: center;
+	padding: 18px;
+	min-height: 0;
+	line-height: 1.4;
+}
+
+/* =====================================================================
+   1 — HERO
+   ===================================================================== */
+.fmh-course-hero {
+	padding: 64px 0 76px;
+	position: relative;
+	overflow: hidden;
+	background:
+		radial-gradient(circle at 8% 10%, rgba(30,58,95,0.13) 0%, transparent 46%),
+		radial-gradient(circle at 94% 85%, rgba(201,74,74,0.11) 0%, transparent 46%),
+		linear-gradient(180deg, var(--fmh-cream) 0%, #FDF7EE 100%);
+}
+/* Stessa immagine dell'hero, molto attenuata, come texture di fondo. */
+.fmh-course-hero-bg {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	background-size: cover;
+	background-position: center;
+	opacity: .10;
+	pointer-events: none;
+}
+.fmh-course-hero > .fmh-wrap { position: relative; z-index: 1; }
+
+/* Colonna testo 66%, colonna immagine 34%. */
+.fmh-course-hero-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 66fr) minmax(0, 34fr);
+	gap: 56px;
+	align-items: center;
+}
+.fmh-course-hero h1 { margin-bottom: 18px; }
+.fmh-course-lead {
+	font-size: 1.16rem;
+	line-height: 1.65;
+	color: var(--fmh-ink-soft);
+	max-width: 600px;
+	margin-bottom: 26px;
+}
+
+.fmh-hero-schedule { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 26px; }
+.fmh-hero-schedule .fmh-date-badge { font-weight: 700; }
+
+/* Prezzo + offerta coppia: un unico blocco compatto, così la parte
+   economica si legge come un'unica informazione invece che come due
+   elementi scollegati. */
+.fmh-price { margin-bottom: 16px; font-size: 1.02rem; color: var(--fmh-ink-soft); }
+.fmh-price strong {
+	display: block;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	color: var(--fmh-blue-deep);
+	font-size: clamp(1.75rem, 2.7vw, 2.2rem);
+	line-height: 1;
+	margin-bottom: 8px;
+}
+/* Il bonus incluso è un'informazione di vendita: va accentuato, non
+   confuso con la riga di dettaglio del prezzo. */
+.fmh-price b {
+	display: block;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 1.06rem;
+	color: var(--fmh-green-dark);
+	line-height: 1.35;
+}
+.fmh-couple {
+	display: grid;
+	gap: 5px;
+	margin-bottom: 28px;
+	padding: 17px 20px;
+	max-width: 480px;
+	background: var(--fmh-white);
+	border: 1px solid var(--fmh-border-soft);
+	border-left: 4px solid var(--fmh-red);
+	border-radius: 0 var(--fmh-radius-sm) var(--fmh-radius-sm) 0;
+	box-shadow: var(--fmh-shadow-soft);
+}
+.fmh-couple span:first-child {
+	font-weight: 700;
+	color: var(--fmh-blue-deep);
+	font-size: .92rem;
+}
+.fmh-couple strong {
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 1.16rem;
+	line-height: 1.3;
+	color: var(--fmh-red-dark);
+}
+.fmh-couple small { color: var(--fmh-ink-soft); font-size: .86rem; line-height: 1.5; }
+
+.fmh-microcopy {
+	display: block;
+	margin-top: 16px;
+	color: var(--fmh-ink-soft);
+	font-size: .88rem;
+	line-height: 1.5;
+}
+
+.fmh-course-hero-media {
+	position: relative;
+	overflow: hidden;
+	border-radius: var(--fmh-radius);
+	box-shadow: 0 26px 64px rgba(30,58,95,0.24);
+}
+.fmh-course-hero-media img {
+	width: 100%;
+	aspect-ratio: 4/5;
+	object-fit: cover;
+	object-position: var(--fmh-hero-focal-x) var(--fmh-hero-focal-y);
+	filter: blur(var(--fmh-hero-blur));
+}
+.fmh-course-hero-media .fmh-placeholder,
+.fmh-course-hero-media .fmh-course-placeholder { aspect-ratio: 4/5; border-radius: var(--fmh-radius); }
+.fmh-course-hero-media::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: var(--fmh-hero-overlay);
+	pointer-events: none;
+	mix-blend-mode: multiply;
+	opacity: .5;
+}
+
+@media (max-width: 900px) {
+	.fmh-course-hero-grid { grid-template-columns: 1fr; gap: 36px; text-align: center; }
+	.fmh-course-hero-grid > div:first-child { display: flex; flex-direction: column; align-items: center; }
+	.fmh-course-lead { margin-left: auto; margin-right: auto; }
+	.fmh-hero-schedule { justify-content: center; }
+	.fmh-couple { text-align: left; }
+	/* Il titolo resta il primo elemento anche su mobile: l'immagine segue il
+	   testo, come nella versione precedente, per non spingere la promessa
+	   principale sotto la piega. */
+	.fmh-course-hero-media { max-width: 380px; margin: 0 auto; }
+	.fmh-course-hero-media img { aspect-ratio: 4/3; }
+	.fmh-course-hero-media .fmh-placeholder,
+	.fmh-course-hero-media .fmh-course-placeholder { aspect-ratio: 4/3; }
+}
+
+/* =====================================================================
+   2 — TEST INTERATTIVO (Scenario A/B)
+   ===================================================================== */
+.fmh-test { background: var(--fmh-white); }
+.fmh-test h2 { margin-bottom: 18px; }
+.fmh-test .fmh-narrow > p { font-size: 1.06rem; margin-bottom: 42px; }
+
+.fmh-scenarios {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 22px;
+	margin-bottom: 34px;
+	text-align: left;
+}
+.fmh-scenarios details {
+	background: var(--fmh-cream);
+	border: 1px solid var(--fmh-border-soft);
+	border-radius: var(--fmh-radius);
+	overflow: hidden;
+	box-shadow: var(--fmh-shadow-soft);
+	transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+}
+.fmh-scenarios details:hover {
+	box-shadow: var(--fmh-shadow-card);
+	transform: translateY(-3px);
+	border-color: rgba(30,58,95,.28);
+}
+.fmh-scenarios summary {
+	list-style: none;
+	cursor: pointer;
+	padding: 26px;
+	display: grid;
+	gap: 13px;
+}
+.fmh-scenarios summary::-webkit-details-marker { display: none; }
+.fmh-scenarios summary span {
+	justify-self: start;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: .78rem;
+	text-transform: uppercase;
+	letter-spacing: .06em;
+	color: var(--fmh-blue-deep);
+	background: var(--fmh-blue-light);
+	padding: 6px 13px;
+	border-radius: 999px;
+}
+.fmh-scenarios summary strong { font-size: 1.06rem; color: var(--fmh-ink); line-height: 1.5; }
+.fmh-scenarios summary b {
+	justify-self: start;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: .92rem;
+	color: var(--fmh-red);
+}
+.fmh-scenarios summary b::after { content: " →"; }
+.fmh-scenarios details[open] summary b::after { content: " ↓"; }
+
+.fmh-scenarios details > div { padding: 22px 26px 26px; border-top: 1px solid var(--fmh-border-soft); }
+.fmh-scenarios details:nth-child(1) > div { background: var(--fmh-red-light); box-shadow: inset 4px 0 0 var(--fmh-red); }
+.fmh-scenarios details:nth-child(2) > div { background: var(--fmh-green-light); box-shadow: inset 4px 0 0 var(--fmh-green); }
+.fmh-scenarios details h3 { font-size: 1.05rem; margin-bottom: 9px; }
+.fmh-scenarios details p { font-size: .96rem; margin-bottom: 12px; }
+.fmh-scenarios details strong { color: var(--fmh-blue-deep); font-size: .96rem; }
+
+.fmh-text-link {
+	display: inline-block;
+	font-weight: 700;
+	color: var(--fmh-blue-deep);
+	border-bottom: 2px solid var(--fmh-red);
+	padding-bottom: 3px;
+	transition: color .15s ease, border-color .15s ease;
+}
+.fmh-text-link:hover { color: var(--fmh-red-dark); border-color: var(--fmh-red-dark); }
+
+@media (max-width: 700px) { .fmh-scenarios { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   3 — LA LETTERA (storia vera)
+   ===================================================================== */
+.fmh-letter {
+	background-color: var(--fmh-cream-alt);
+	background-size: cover;
+	background-position: center;
+	position: relative;
+}
+.fmh-letter-paper {
+	max-width: 720px;
+	margin: 0 auto;
+	padding: clamp(36px, 6vw, 62px);
+	background: rgba(255,253,248,.96);
+	border-radius: var(--fmh-radius);
+	box-shadow: var(--fmh-shadow-card);
+	text-align: center;
+}
+.fmh-letter-paper > h2 {
+	font-family: var(--fmh-font-story);
+	font-style: italic;
+	font-size: clamp(1.6rem, 3vw, 2.15rem);
+	color: var(--fmh-blue-deep);
+	margin-bottom: 30px;
+}
+.fmh-letter-copy {
+	font-family: var(--fmh-font-story);
+	font-size: 1.1rem;
+	line-height: 1.78;
+	color: var(--fmh-ink);
+	text-align: left;
+}
+.fmh-letter-copy p { color: var(--fmh-ink); margin-bottom: 18px; }
+.fmh-letter-copy p:last-child { margin-bottom: 0; }
+.fmh-letter-copy strong { color: var(--fmh-blue-deep); }
+.fmh-letter-copy em { color: var(--fmh-ink-soft); }
+
+@media (max-width: 680px) {
+	.fmh-letter-paper { padding: 32px 24px; }
+	.fmh-letter-copy { font-size: 1.04rem; }
+}
+
+/* =====================================================================
+   4 — IL METODO (timeline in 5 passaggi)
+   ===================================================================== */
+.fmh-method {
+	background: linear-gradient(160deg, var(--fmh-blue-deep) 0%, var(--fmh-blue-darker) 100%);
+	color: #fff;
+	text-align: center;
+}
+.fmh-method .fmh-eyebrow { background: rgba(255,255,255,.14); color: #fff; }
+.fmh-method h2 { color: #fff; max-width: 660px; margin: 0 auto 16px; }
+.fmh-method > .fmh-wrap > p {
+	color: rgba(255,255,255,.82);
+	max-width: 580px;
+	margin: 0 auto 48px;
+	font-size: 1.05rem;
+}
+
+.fmh-timeline {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 16px;
+	margin-bottom: 48px;
+	text-align: left;
+}
+.fmh-timeline li {
+	display: flex;
+	flex-direction: column;
+	background: rgba(255,255,255,.07);
+	border: 1px solid rgba(255,255,255,.16);
+	border-radius: var(--fmh-radius-sm);
+	overflow: hidden;
+	transition: background-color .2s ease, transform .2s ease, border-color .2s ease;
+}
+.fmh-timeline li:hover {
+	background: rgba(255,255,255,.12);
+	border-color: rgba(255,255,255,.3);
+	transform: translateY(-4px);
+}
+.fmh-timeline img {
+	width: 100%;
+	aspect-ratio: 4/3;
+	object-fit: cover;
+}
+.fmh-timeline .fmh-placeholder,
+.fmh-timeline .fmh-course-placeholder {
+	aspect-ratio: 4/3;
+	border: 0;
+	border-radius: 0;
+	background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
+	color: rgba(255,255,255,.8);
+}
+.fmh-timeline li > div { padding: 17px 17px 21px; }
+.fmh-timeline span {
+	display: block;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: .74rem;
+	letter-spacing: .06em;
+	color: #8FB8DC;
+	margin-bottom: 9px;
+}
+.fmh-timeline h3 { color: #fff; font-size: 1.02rem; margin-bottom: 7px; }
+.fmh-timeline p { color: rgba(255,255,255,.78); font-size: .88rem; line-height: 1.55; }
+
+.fmh-mantra {
+	font-family: var(--fmh-font-display);
+	font-weight: 600;
+	font-size: 1.16rem;
+	color: rgba(255,255,255,.86);
+	max-width: 640px;
+	margin: 0 auto;
+	line-height: 1.6;
+}
+.fmh-method p.fmh-mantra { color: rgba(255,255,255,.86); }
+.fmh-mantra strong {
+	display: block;
+	font-size: 1.4rem;
+	margin-bottom: 12px;
+	color: #fff;
+	letter-spacing: .01em;
+}
+
+@media (max-width: 980px) { .fmh-timeline { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 700px) { .fmh-timeline { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .fmh-timeline { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   5 — QUELLO CHE NON TI PROMETTIAMO
+   ===================================================================== */
+.fmh-admission { background: var(--fmh-white); }
+.fmh-admission h2 { margin-bottom: 18px; }
+.fmh-admission .fmh-narrow > p { font-size: 1.06rem; margin-bottom: 14px; }
+.fmh-admission h3 { margin: 34px 0 18px; }
+.fmh-admission-yes {
+	background: var(--fmh-green-light);
+	border: 1px solid rgba(46,125,91,.22);
+	border-left: 4px solid var(--fmh-green);
+	border-radius: var(--fmh-radius);
+	padding: 28px 30px;
+	margin-bottom: 34px;
+	text-align: left;
+}
+.fmh-admission .fmh-admission-yes p { color: var(--fmh-green-dark); font-size: 1.02rem; margin: 0; }
+.fmh-admission-yes strong { color: var(--fmh-green-dark); }
+
+/* =====================================================================
+   6 — LA PRATICA
+   ===================================================================== */
+.fmh-practice { background: var(--fmh-cream-alt); text-align: center; }
+.fmh-practice h2 { margin-bottom: 16px; }
+.fmh-practice > .fmh-wrap > p { max-width: 660px; margin: 0 auto; font-size: 1.05rem; }
+
+.fmh-practice-media {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0,1fr));
+	gap: 20px;
+	margin: 40px 0;
+	text-align: left;
+}
+.fmh-practice-media img {
+	width: 100%;
+	height: 330px;
+	object-fit: cover;
+	object-position: center;
+	border-radius: var(--fmh-radius);
+	box-shadow: var(--fmh-shadow-card);
+}
+.fmh-practice-media .fmh-placeholder,
+.fmh-practice-media .fmh-course-placeholder {
+	height: 330px;
+	border-radius: var(--fmh-radius);
+	box-shadow: var(--fmh-shadow-soft);
+}
+
+.fmh-practice-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 22px;
+	margin: 40px 0;
+	text-align: left;
+}
+.fmh-practice-grid article {
+	background: var(--fmh-white);
+	border-radius: var(--fmh-radius);
+	padding: 30px 26px;
+	box-shadow: var(--fmh-shadow-soft);
+	border-top: 4px solid var(--fmh-blue-deep);
+	transition: transform .2s ease, box-shadow .2s ease;
+}
+.fmh-practice-grid article:hover { transform: translateY(-5px); box-shadow: var(--fmh-shadow-card); }
+.fmh-practice-grid b {
+	display: grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	margin-bottom: 18px;
+	background: var(--fmh-blue-deep);
+	color: #fff;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 1.1rem;
+}
+.fmh-practice-grid h3 { margin-bottom: 9px; }
+.fmh-practice-grid p { font-size: .96rem; }
+
+.fmh-practice-note {
+	display: flex;
+	align-items: center;
+	gap: 8px 16px;
+	justify-content: center;
+	flex-wrap: wrap;
+	max-width: 720px;
+	margin: 0 auto;
+	background: var(--fmh-blue-light);
+	border-radius: var(--fmh-radius-sm);
+	padding: 20px 26px;
+	text-align: center;
+}
+.fmh-practice-note h3 { color: var(--fmh-blue-deep); font-size: 1.12rem; }
+.fmh-practice-note p { color: var(--fmh-blue-deep); font-weight: 500; }
+
+@media (max-width: 760px) {
+	.fmh-practice-media, .fmh-practice-grid { grid-template-columns: 1fr; }
+	.fmh-practice-media img,
+	.fmh-practice-media .fmh-placeholder,
+	.fmh-practice-media .fmh-course-placeholder { height: 240px; }
+}
+
+/* =====================================================================
+   7 — COSA IMPARERAI (6 card programma)
+   ===================================================================== */
+.fmh-program { background: var(--fmh-white); }
+.fmh-program h2 { text-align: center; margin-bottom: 12px; }
+.fmh-program > .fmh-wrap > h3 {
+	text-align: center;
+	font-weight: 500;
+	color: var(--fmh-ink-soft);
+	font-size: 1.12rem;
+	max-width: 640px;
+	margin: 0 auto;
+}
+.fmh-program-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 20px;
+	margin-top: 46px;
+}
+.fmh-program-grid details {
+	display: flex;
+	flex-direction: column;
+	background: var(--fmh-cream);
+	border: 1px solid var(--fmh-border-soft);
+	border-radius: var(--fmh-radius);
+	overflow: hidden;
+	box-shadow: var(--fmh-shadow-soft);
+	transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.fmh-program-grid details:hover {
+	transform: translateY(-5px);
+	box-shadow: var(--fmh-shadow-card);
+	border-color: rgba(30,58,95,.28);
+}
+.fmh-program-grid summary { list-style: none; cursor: pointer; padding: 22px; }
+.fmh-program-grid summary::-webkit-details-marker { display: none; }
+.fmh-program-grid summary img {
+	width: 100%;
+	aspect-ratio: 16/9;
+	object-fit: cover;
+	border-radius: var(--fmh-radius-sm);
+	margin-bottom: 17px;
+}
+.fmh-program-grid summary .fmh-placeholder,
+.fmh-program-grid summary .fmh-course-placeholder {
+	aspect-ratio: 16/9;
+	margin-bottom: 17px;
+}
+.fmh-program-grid summary span {
+	display: inline-block;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: .74rem;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+	color: var(--fmh-red);
+	margin-bottom: 9px;
+}
+.fmh-program-grid summary strong {
+	display: block;
+	font-family: var(--fmh-font-display);
+	font-weight: 600;
+	font-size: 1.06rem;
+	color: var(--fmh-blue-deep);
+	line-height: 1.4;
+}
+.fmh-program-grid summary::after {
+	content: "Leggi di più +";
+	display: inline-block;
+	margin-top: 14px;
+	font-size: .82rem;
+	font-weight: 700;
+	color: var(--fmh-blue-deep);
+	opacity: .7;
+}
+.fmh-program-grid details[open] summary::after { content: "Chiudi −"; }
+.fmh-program-grid details > p {
+	padding: 0 22px 24px;
+	font-size: .95rem;
+	line-height: 1.65;
+}
+
+@media (max-width: 900px) { .fmh-program-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 620px) { .fmh-program-grid { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   8 — CHI SIAMO (bio + fonti)
+   ===================================================================== */
+.fmh-authority { background: var(--fmh-cream-alt); }
+.fmh-authority h2 { text-align: center; margin-bottom: 12px; }
+.fmh-authority > .fmh-wrap > h3 {
+	text-align: center;
+	font-weight: 500;
+	color: var(--fmh-ink-soft);
+	font-size: 1.1rem;
+	max-width: 640px;
+	margin: 0 auto 46px;
+}
+.fmh-bios {
+	display: flex;
+	flex-direction: column;
+	gap: 22px;
+	max-width: 900px;
+	margin: 0 auto 40px;
+}
+.fmh-bios article {
+	display: grid;
+	grid-template-columns: 128px 1fr;
+	gap: 30px;
+	align-items: center;
+	background: var(--fmh-white);
+	border-radius: var(--fmh-radius);
+	padding: 28px 32px;
+	box-shadow: var(--fmh-shadow-soft);
+	transition: transform .2s ease, box-shadow .2s ease;
+}
+.fmh-bios article:hover { transform: translateY(-3px); box-shadow: var(--fmh-shadow-card); }
+.fmh-bios .fmh-avatar-img,
+.fmh-bios .fmh-avatar-fallback {
+	width: 128px;
+	height: 128px;
+	border-radius: 50%;
+	object-fit: cover;
+	flex-shrink: 0;
+}
+.fmh-bios .fmh-avatar-fallback {
+	display: grid;
+	place-items: center;
+	background: var(--fmh-blue-deep);
+	color: #fff;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 2.1rem;
+}
+.fmh-bios h3 { margin-bottom: 5px; }
+.fmh-bios strong {
+	display: block;
+	font-size: .8rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: var(--fmh-red);
+	margin-bottom: 11px;
+	line-height: 1.45;
+}
+.fmh-bios p { font-size: .98rem; }
+
+.fmh-sources {
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 32px;
+	border-radius: var(--fmh-radius);
+	background: var(--fmh-blue-deep);
+	color: #fff;
+	text-align: center;
+}
+.fmh-sources h3 {
+	color: #fff;
+	font-size: .9rem;
+	text-transform: uppercase;
+	letter-spacing: .06em;
+	margin-bottom: 18px;
+}
+.fmh-sources span {
+	display: inline-flex;
+	margin: 4px;
+	padding: 8px 16px;
+	border: 1px solid rgba(255,255,255,.3);
+	border-radius: 999px;
+	font-size: .86rem;
+	font-weight: 600;
+}
+.fmh-authority .fmh-sources p {
+	color: rgba(255,255,255,.88);
+	margin-top: 20px;
+	font-size: .96rem;
+}
+.fmh-sources p strong { color: #fff; }
+
+@media (max-width: 620px) {
+	.fmh-bios article { grid-template-columns: 1fr; text-align: center; justify-items: center; gap: 20px; padding: 28px 22px; }
+}
+
+/* =====================================================================
+   9 — IL LIBRO (superbonus) — eccezione cromatica teal/terracotta
+   ===================================================================== */
+.fmh-book { background: var(--fmh-white); }
+.fmh-course-book-card {
+	max-width: 980px;
+	margin: 0 auto;
+	background: var(--fmh-cream);
+	border-radius: var(--fmh-radius);
+	box-shadow: var(--fmh-shadow-card);
+	padding: 46px;
+	display: grid;
+	grid-template-columns: 240px 1fr;
+	gap: 46px;
+	align-items: center;
+	border-top: 6px solid var(--fmh-book-teal);
+}
+.fmh-course-book-card img {
+	width: 100%;
+	border-radius: var(--fmh-radius-sm);
+	box-shadow: var(--fmh-shadow-card);
+}
+.fmh-course-book-card .fmh-placeholder,
+.fmh-course-book-card .fmh-course-placeholder { aspect-ratio: 3/4; }
+.fmh-course-book-card .fmh-eyebrow { color: var(--fmh-book-teal); background: rgba(11,101,96,.1); }
+.fmh-course-book-card h2 {
+	color: var(--fmh-book-teal-darker);
+	font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+	margin-bottom: 18px;
+}
+.fmh-course-book-card > div:last-child > p { margin-bottom: 18px; }
+
+/* La lista è un gruppo di pillole: annulla display:flex/column e i margini
+   che .fmh-book-list li eredita da frontend.css (dove serve alla home). */
+.fmh-course-book-card .fmh-book-list {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 10px;
+	margin-bottom: 24px;
+}
+.fmh-course-book-card .fmh-book-list li {
+	display: block;
+	margin: 0;
+	background: rgba(11,101,96,.07);
+	border-radius: var(--fmh-radius-sm);
+	padding: 11px 14px;
+	font-size: .88rem;
+	font-weight: 600;
+	color: var(--fmh-book-teal-darker);
+	text-align: center;
+}
+.fmh-course-book-price-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 16px;
+	background: rgba(11,101,96,.08);
+	border-radius: var(--fmh-radius-sm);
+	padding: 19px 24px;
+}
+.fmh-course-book-price-row strong {
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 1.5rem;
+	color: var(--fmh-book-terracotta);
+}
+.fmh-course-book-price-row span { color: var(--fmh-ink-soft); font-size: 1.02rem; line-height: 1.6; }
+
+@media (max-width: 820px) {
+	.fmh-course-book-card { grid-template-columns: 1fr; padding: 32px 26px; text-align: center; gap: 30px; }
+	.fmh-course-book-card > div:first-child { max-width: 210px; margin: 0 auto; }
+	.fmh-course-book-card .fmh-book-list { grid-template-columns: 1fr 1fr; }
+	.fmh-course-book-price-row { flex-direction: column; text-align: center; }
+}
+
+/* =====================================================================
+   10 — COME FUNZIONA (journey in tre tempi)
+   ===================================================================== */
+.fmh-journey { background: var(--fmh-cream-alt); }
+.fmh-journey h2 { text-align: center; margin-bottom: 46px; }
+.fmh-journey-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 22px;
+	max-width: 1000px;
+	margin: 0 auto;
+}
+.fmh-journey-grid article {
+	background: var(--fmh-white);
+	border-radius: var(--fmh-radius);
+	padding: 32px 28px;
+	box-shadow: var(--fmh-shadow-soft);
+	text-align: center;
+	transition: transform .2s ease, box-shadow .2s ease;
+}
+.fmh-journey-grid article:hover { transform: translateY(-4px); box-shadow: var(--fmh-shadow-card); }
+.fmh-journey-grid h3 {
+	display: inline-block;
+	font-size: .82rem;
+	text-transform: uppercase;
+	letter-spacing: .06em;
+	font-weight: 700;
+	color: var(--fmh-blue-deep);
+	background: var(--fmh-blue-light);
+	padding: 7px 18px;
+	border-radius: 999px;
+	margin-bottom: 18px;
+}
+.fmh-journey-grid p { color: var(--fmh-ink-soft); font-size: .98rem; line-height: 1.7; margin-bottom: 10px; }
+.fmh-journey-grid p:last-child { margin-bottom: 0; }
+.fmh-journey-grid p strong { display: block; color: var(--fmh-ink); margin-bottom: 5px; }
+
+@media (max-width: 760px) { .fmh-journey-grid { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   11 — OFFERTA, DATE E CHECKOUT
+   ===================================================================== */
+.fmh-sessions { background: var(--fmh-white); }
+/* Più respiro fra il titolo della sezione e le card dell'offerta. */
+.fmh-sessions h2 { text-align: center; margin-bottom: 68px; }
+.fmh-session-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 24px;
+	max-width: 960px;
+	margin: 0 auto 46px;
+}
+/* Contenuto delle card centrato. */
+.fmh-session-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	background: var(--fmh-cream);
+	border: 2px solid var(--fmh-border-soft);
+	border-radius: var(--fmh-radius);
+	padding: 32px;
+	box-shadow: var(--fmh-shadow-soft);
+	transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.fmh-session-card:hover {
+	transform: translateY(-5px);
+	box-shadow: var(--fmh-shadow-lift);
+	border-color: rgba(30,58,95,.38);
+}
+.fmh-session-card h3 { font-size: 1.32rem; margin-bottom: 8px; }
+.fmh-session-card > p { font-size: .95rem; margin-bottom: 5px; }
+
+/* Due prezzi affiancati: la coppia è l'offerta da spingere, il singolo
+   resta leggibile ma volutamente più discreto. */
+.fmh-session-prices {
+	display: flex;
+	align-items: baseline;
+	justify-content: center;
+	flex-wrap: nowrap;
+	gap: 14px;
+	margin: 20px 0 10px;
+}
+.fmh-session-price-couple,
+.fmh-session-price-single { white-space: nowrap; }
+.fmh-session-price-couple {
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 1.5rem;
+	line-height: 1.1;
+	color: var(--fmh-blue-deep);
+}
+.fmh-session-price-single {
+	font-family: var(--fmh-font-display);
+	font-weight: 600;
+	font-size: .98rem;
+	line-height: 1.1;
+	color: var(--fmh-ink-soft);
+	opacity: .8;
+}
+.fmh-session-card p.fmh-session-bonus {
+	font-weight: 700;
+	font-size: .92rem;
+	color: var(--fmh-green-dark);
+	margin-bottom: 0;
+}
+.fmh-availability {
+	display: inline-block;
+	margin: 16px 0 20px;
+	padding: 7px 15px;
+	border-radius: 999px;
+	background: var(--fmh-green-light);
+	color: var(--fmh-green-dark);
+	font-size: .88rem;
+	font-weight: 700;
+}
+.fmh-session-card.is-sold-out { opacity: .72; }
+.fmh-session-card.is-sold-out .fmh-availability { background: var(--fmh-red-light); color: var(--fmh-red-dark); }
+.fmh-session-card .fmh-btn-primary { width: 100%; margin-top: auto; }
+.fmh-session-card .fmh-btn-primary:disabled {
+	cursor: not-allowed;
+	opacity: .5;
+	transform: none;
+	box-shadow: none;
+}
+
+.fmh-couple-offer {
+	position: relative;
+	max-width: 880px;
+	margin: 0 auto;
+	padding: 42px clamp(24px, 5vw, 50px);
+	border-radius: var(--fmh-radius);
+	background: linear-gradient(150deg, var(--fmh-blue-deep), var(--fmh-blue-darker));
+	color: #fff;
+	text-align: center;
+	box-shadow: var(--fmh-shadow-card);
+}
+.fmh-couple-offer > span {
+	display: inline-block;
+	margin-bottom: 16px;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: .78rem;
+	text-transform: uppercase;
+	letter-spacing: .06em;
+	color: var(--fmh-blue-darker);
+	background: #fff;
+	padding: 7px 18px;
+	border-radius: 999px;
+}
+.fmh-couple-offer h3 { color: #fff; font-size: 1.6rem; max-width: 640px; margin: 0 auto 28px; }
+.fmh-sessions .fmh-couple-offer p {
+	color: rgba(255,255,255,.9);
+	max-width: 660px;
+	margin: 0 auto 10px;
+}
+.fmh-sessions .fmh-couple-offer p:last-child { margin-bottom: 0; }
+.fmh-couple-offer strong { color: #fff; }
+
+/* Confronto prezzi: due riquadri affiancati con la freccia in mezzo,
+   così il vantaggio dell'offerta si legge a colpo d'occhio. */
+.fmh-couple-compare {
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin: 0 auto 26px;
+}
+.fmh-couple-tile {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-width: 190px;
+	padding: 20px 26px;
+	border-radius: var(--fmh-radius-sm);
+	background: rgba(255,255,255,.09);
+	border: 1px solid rgba(255,255,255,.2);
+}
+.fmh-couple-tile--highlight {
+	background: #fff;
+	border-color: #fff;
+	box-shadow: 0 14px 34px rgba(0,0,0,.22);
+}
+.fmh-couple-tile-label {
+	font-size: .76rem;
+	font-weight: 700;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+	color: rgba(255,255,255,.8);
+}
+.fmh-couple-tile--highlight .fmh-couple-tile-label { color: var(--fmh-blue-deep); opacity: .75; }
+.fmh-couple-tile-price {
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 2rem;
+	line-height: 1.05;
+	color: #fff;
+}
+.fmh-couple-tile--highlight .fmh-couple-tile-price { color: var(--fmh-blue-deep); font-size: 2.35rem; }
+.fmh-couple-tile-price s {
+	font-size: 1.05rem;
+	font-weight: 600;
+	color: var(--fmh-red);
+	opacity: .85;
+	margin-left: 4px;
+}
+.fmh-couple-tile-save {
+	font-size: .82rem;
+	font-weight: 700;
+	color: var(--fmh-green-dark);
+	background: var(--fmh-green-light);
+	padding: 4px 12px;
+	border-radius: 999px;
+}
+.fmh-couple-vs {
+	align-self: center;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 1.5rem;
+	color: rgba(255,255,255,.55);
+}
+@media (max-width: 520px) {
+	.fmh-couple-compare { flex-direction: column; align-items: stretch; gap: 10px; }
+	.fmh-couple-vs { transform: rotate(90deg); font-size: 1.2rem; }
+}
+
+.fmh-venue-note {
+	text-align: center;
+	color: var(--fmh-ink-soft);
+	margin-top: 24px;
+	font-size: .95rem;
+}
+.fmh-readiness-note {
+	text-align: center;
+	font-weight: 700;
+	color: var(--fmh-blue-deep);
+	margin-top: 24px;
+}
+
+/* =====================================================================
+   12 — GARANZIA SERENITÀ
+   ===================================================================== */
+.fmh-guarantee { background: var(--fmh-cream-alt); }
+.fmh-guarantee .fmh-narrow > span:first-child {
+	display: inline-block;
+	margin-bottom: 18px;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: .78rem;
+	text-transform: uppercase;
+	letter-spacing: .06em;
+	color: var(--fmh-green-dark);
+	background: var(--fmh-green-light);
+	padding: 7px 17px;
+	border-radius: 999px;
+}
+.fmh-guarantee h2 { margin-bottom: 16px; }
+.fmh-guarantee .fmh-narrow > p:first-of-type {
+	max-width: 660px;
+	margin: 0 auto 42px;
+	font-size: 1.02rem;
+}
+.fmh-guarantee-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 18px;
+	text-align: left;
+}
+.fmh-guarantee-grid article {
+	background: var(--fmh-white);
+	border: 1px solid rgba(46,125,91,.22);
+	border-radius: var(--fmh-radius);
+	padding: 26px;
+	box-shadow: var(--fmh-shadow-soft);
+	transition: transform .2s ease, box-shadow .2s ease;
+}
+.fmh-guarantee-grid article:hover { transform: translateY(-4px); box-shadow: var(--fmh-shadow-card); }
+.fmh-guarantee-grid h3 { color: var(--fmh-green-dark); font-size: 1.08rem; margin-bottom: 9px; }
+.fmh-guarantee-grid p { font-size: .95rem; }
+.fmh-guarantee .fmh-narrow > p:last-child {
+	margin-top: 32px;
+	color: var(--fmh-ink-soft);
+	font-size: .86rem;
+	line-height: 1.6;
+}
+
+@media (max-width: 640px) { .fmh-guarantee-grid { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   13 — FAQ
+   ===================================================================== */
+.fmh-faq { background: var(--fmh-white); }
+.fmh-faq h2 { text-align: center; margin-bottom: 42px; }
+.fmh-course-faq-list { text-align: left; }
+.fmh-course-faq-item {
+	border: 1px solid var(--fmh-border-soft);
+	border-radius: var(--fmh-radius-sm);
+	margin-bottom: 14px;
+	overflow: hidden;
+	transition: box-shadow .2s ease, border-color .2s ease;
+}
+.fmh-course-faq-item:last-child { margin-bottom: 0; }
+.fmh-course-faq-item:hover { border-color: var(--fmh-blue-deep); box-shadow: var(--fmh-shadow-soft); }
+.fmh-course-faq-item summary {
+	cursor: pointer;
+	padding: 18px 22px;
+	font-family: var(--fmh-font-display);
+	font-weight: 600;
+	color: var(--fmh-blue-deep);
+	font-size: 1rem;
+	list-style: none;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	transition: background .2s ease;
+}
+.fmh-course-faq-item summary:hover { background: rgba(30,58,95,.05); }
+.fmh-course-faq-item summary::-webkit-details-marker { display: none; }
+.fmh-course-faq-number {
+	flex-shrink: 0;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: var(--fmh-blue-light);
+	color: var(--fmh-blue-deep);
+	font-size: .78rem;
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.fmh-course-faq-item summary .fmh-course-faq-q { flex: 1; text-align: left; line-height: 1.4; }
+.fmh-course-faq-item summary::after {
+	content: "+";
+	font-size: 1.3rem;
+	color: var(--fmh-red);
+	flex-shrink: 0;
+	transition: transform .2s ease;
+}
+.fmh-course-faq-item[open] summary::after { transform: rotate(45deg); }
+.fmh-course-faq-item[open] summary { background: rgba(30,58,95,.06); }
+.fmh-course-faq-item p {
+	padding: 4px 22px 22px 62px;
+	color: var(--fmh-ink-soft);
+	font-size: .95rem;
+	line-height: 1.65;
+}
+
+@media (max-width: 560px) {
+	.fmh-course-faq-item summary { padding: 16px; gap: 11px; }
+	.fmh-course-faq-item p { padding: 4px 16px 20px 16px; }
+}
+
+/* =====================================================================
+   14 — CHIUSURA
+   ===================================================================== */
+.fmh-final {
+	position: relative;
+	overflow: hidden;
+	isolation: isolate;
+	text-align: center;
+	background-color: var(--fmh-blue-darker);
+	color: #fff;
+}
+.fmh-course-page > section.fmh-final { padding: 100px 0; }
+.fmh-final::before {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	inset: -10px;
+	background-image: linear-gradient(var(--fmh-final-overlay), var(--fmh-final-overlay)), var(--fmh-final-image);
+	background-size: cover;
+	background-position: var(--fmh-final-focal-x) var(--fmh-final-focal-y);
+	filter: blur(var(--fmh-final-blur));
+}
+.fmh-final h2 { color: #fff; max-width: 660px; margin: 0 auto 20px; }
+.fmh-final .fmh-narrow > p:first-of-type {
+	color: rgba(255,255,255,.85);
+	max-width: 580px;
+	margin: 0 auto 36px;
+}
+.fmh-final h3 { color: #fff; font-size: 1.16rem; max-width: 580px; margin: 0 auto 20px; }
+.fmh-final-list {
+	text-align: center;
+	max-width: 520px;
+	margin: 0 auto 36px;
+	background: rgba(255,255,255,.09);
+	border: 1px solid rgba(255,255,255,.22);
+	border-radius: var(--fmh-radius);
+	padding: 24px 30px;
+}
+.fmh-final .fmh-final-list p { color: rgba(255,255,255,.92); font-size: 1.02rem; line-height: 1.75; }
+.fmh-final p.fmh-final-offer { font-size: 1.08rem; color: rgba(255,255,255,.9); margin-bottom: 32px; }
+.fmh-final-offer strong {
+	display: block;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 1.55rem;
+	color: #fff;
+	margin-bottom: 6px;
+}
+.fmh-final small { display: block; margin-top: 18px; color: rgba(255,255,255,.75); font-size: .88rem; }
+
+/* =====================================================================
+   CTA STICKY MOBILE
+   ===================================================================== */
+.fmh-mobile-cta {
+	position: fixed;
+	z-index: 9990;
+	left: 12px;
+	right: 12px;
+	bottom: 12px;
+	transform: translateY(150%);
+	transition: transform .28s ease;
+}
+.fmh-mobile-cta.is-visible { transform: translateY(0); }
+.fmh-mobile-cta a {
+	display: block;
+	padding: 16px;
+	text-align: center;
+	border-radius: 999px;
+	background: var(--fmh-red);
+	color: #fff;
+	text-decoration: none;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 1.02rem;
+	box-shadow: 0 10px 30px rgba(0,0,0,.3);
+}
+.fmh-mobile-cta a:hover { background: var(--fmh-red-dark); color: #fff; }
+/* Su desktop la CTA sticky non serve: le CTA in pagina sono sempre vicine. */
+@media (min-width: 861px) { .fmh-mobile-cta { display: none; } }
+
+/* =====================================================================
+   MODALE DI CHECKOUT
+   ===================================================================== */
+.fmh-course-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	background: rgba(20,40,67,.72);
+	display: grid;
+	place-items: center;
+	padding: 20px;
+	overflow-y: auto;
+	font-family: var(--fmh-font-body);
+	line-height: 1.6;
+	color: var(--fmh-ink);
+}
+.fmh-course-modal-card {
+	position: relative;
+	width: min(760px, 100%);
+	max-height: calc(100vh - 40px);
+	overflow-y: auto;
+	background: #fff;
+	border-radius: var(--fmh-radius);
+	padding: 38px;
+	box-shadow: 0 30px 100px rgba(0,0,0,.32);
+}
+.fmh-course-modal-card h2 {
+	font-family: var(--fmh-font-display);
+	font-weight: 600;
+	color: var(--fmh-blue-deep);
+	font-size: 1.7rem;
+	margin-bottom: 22px;
+	padding-right: 48px;
+}
+.fmh-modal-close {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	width: 40px;
+	height: 40px;
+	border: 0;
+	border-radius: 50%;
+	background: var(--fmh-blue-light);
+	color: var(--fmh-blue-deep);
+	cursor: pointer;
+	font-size: 1.4rem;
+	line-height: 1;
+	display: grid;
+	place-items: center;
+	transition: background-color .15s ease;
+}
+.fmh-modal-close:hover { background: var(--fmh-border-soft); }
+
+.fmh-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fmh-course-modal label {
+	display: block;
+	font-weight: 700;
+	color: var(--fmh-blue-deep);
+	font-size: .9rem;
+	margin-top: 15px;
+}
+.fmh-course-modal input,
+.fmh-course-modal select,
+.fmh-course-modal textarea {
+	width: 100%;
+	margin-top: 6px;
+	border: 1px solid var(--fmh-border-soft);
+	border-radius: 10px;
+	padding: 12px 14px;
+	font: inherit;
+	font-weight: 400;
+	color: var(--fmh-ink);
+	background: #fff;
+	transition: border-color .15s ease, box-shadow .15s ease;
+}
+.fmh-course-modal input:focus,
+.fmh-course-modal select:focus,
+.fmh-course-modal textarea:focus {
+	outline: none;
+	border-color: var(--fmh-blue-deep);
+	box-shadow: 0 0 0 3px rgba(30,58,95,.15);
+}
+.fmh-pair-option {
+	display: flex !important;
+	align-items: flex-start;
+	gap: 10px;
+	font-weight: 600 !important;
+	font-size: .95rem;
+	color: var(--fmh-ink) !important;
+	background: var(--fmh-blue-light);
+	padding: 15px 17px;
+	border-radius: 12px;
+	margin-top: 19px !important;
+}
+.fmh-pair-option input { margin-top: 3px; width: auto; }
+.fmh-course-modal label:has(> input[type="checkbox"]):not(.fmh-pair-option) {
+	display: flex !important;
+	align-items: flex-start;
+	gap: 9px;
+	font-weight: 500 !important;
+	font-size: .88rem;
+	color: var(--fmh-ink-soft) !important;
+	line-height: 1.5;
+}
+.fmh-course-modal label:has(> input[type="checkbox"]) input { width: auto; margin-top: 3px; }
+.fmh-course-modal label a { color: var(--fmh-blue-deep); text-decoration: underline; }
+.fmh-course-modal #fmh-course-one-seat {
+	margin-top: 10px;
+	font-size: .88rem;
+	font-weight: 600;
+	color: var(--fmh-red-dark);
+}
+#fmh-course-invoice-fields,
+#fmh-course-code-field {
+	background: var(--fmh-cream);
+	padding: 4px 17px 14px;
+	border-radius: 12px;
+	margin-top: 10px;
+}
+#fmh-course-code-field input { text-transform: none; }
+#fmh-course-code-message {
+	margin-top: 8px;
+	font-size: .88rem;
+	font-weight: 700;
+	min-height: 1.2em;
+}
+#fmh-course-code-message.is-valid { color: var(--fmh-green-dark); }
+#fmh-course-code-message.is-invalid { color: var(--fmh-red-dark); }
+/* Riepilogo finale: tutto centrato, con il totale come elemento dominante e
+   una linea di separazione che lo stacca dai dati della sessione. */
+.fmh-checkout-summary {
+	display: grid;
+	justify-items: center;
+	gap: 6px;
+	margin-top: 26px;
+	padding: 24px 22px;
+	border-radius: var(--fmh-radius-sm);
+	background: var(--fmh-cream);
+	border: 1px solid var(--fmh-border-soft);
+	font-size: .95rem;
+	text-align: center;
+}
+.fmh-summary-label {
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: .74rem;
+	letter-spacing: .08em;
+	text-transform: uppercase;
+	color: var(--fmh-blue-deep);
+	opacity: .65;
+	margin-bottom: 4px;
+}
+.fmh-checkout-summary #fmh-summary-session {
+	font-weight: 700;
+	color: var(--fmh-blue-deep);
+	font-size: 1.02rem;
+	line-height: 1.4;
+}
+.fmh-checkout-summary strong {
+	display: block;
+	width: 100%;
+	margin-top: 12px;
+	padding-top: 14px;
+	border-top: 1px solid var(--fmh-border-soft);
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 1.5rem;
+	color: var(--fmh-blue-deep);
+}
+.fmh-checkout-summary small { color: var(--fmh-ink-soft); font-size: .86rem; }
+#fmh-course-form-message,
+#fmh-course-payment-message {
+	min-height: 1.3em;
+	margin: 12px 0;
+	font-weight: 700;
+	color: var(--fmh-red-dark);
+	font-size: .92rem;
+}
+.fmh-course-modal button[type="submit"],
+#fmh-course-pay-button { width: 100%; margin-top: 14px; }
+#fmh-course-payment-element { min-height: 120px; margin: 22px 0; }
+
+@media (max-width: 680px) {
+	.fmh-course-modal { padding: 8px; }
+	.fmh-course-modal-card { padding: 28px 20px; border-radius: 18px; max-height: calc(100vh - 16px); }
+	.fmh-form-grid { grid-template-columns: 1fr; }
+	/* 16px evita lo zoom automatico di iOS al focus del campo. */
+	.fmh-course-modal input, .fmh-course-modal select { font-size: 16px; }
+}
+
+/* =====================================================================
+   PAGINA DI RINGRAZIAMENTO
+   ===================================================================== */
+.fmh-course-thankyou {
+	min-height: 100vh;
+	display: grid;
+	place-items: center;
+	padding: 48px 20px;
+	font-family: var(--fmh-font-body);
+	line-height: 1.6;
+}
+.fmh-course-thankyou-card {
+	max-width: 620px;
+	background: #fff;
+	border-radius: var(--fmh-radius);
+	box-shadow: var(--fmh-shadow-card);
+	padding: 46px;
+	text-align: center;
+}
+.fmh-course-thankyou-card h1 {
+	font-family: var(--fmh-font-display);
+	font-weight: 600;
+	color: var(--fmh-blue-deep);
+	font-size: clamp(1.8rem, 4vw, 2.4rem);
+	margin: 18px 0;
+	line-height: 1.15;
+}
+.fmh-course-thankyou-card p { color: var(--fmh-ink-soft); margin-bottom: 14px; }
+.fmh-course-thankyou-card p:last-child { margin-bottom: 0; }
+.fmh-course-check {
+	display: inline-grid;
+	place-items: center;
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	background: var(--fmh-green-light);
+	color: var(--fmh-green-dark);
+	font-size: 1.8rem;
+	font-weight: 800;
+}
+.fmh-course-thankyou-card .fmh-checkout-summary { text-align: left; margin-bottom: 22px; }
+.fmh-course-thankyou-card .fmh-btn-primary { margin-top: 8px; }
+
+@media (max-width: 560px) { .fmh-course-thankyou-card { padding: 32px 22px; } }
+
+/* =====================================================================
+   FOCUS, RITMO MOBILE E MOVIMENTO RIDOTTO
+   ===================================================================== */
+.fmh-course-page a:focus-visible,
+.fmh-course-page summary:focus-visible,
+.fmh-course-page button:focus-visible,
+.fmh-course-modal button:focus-visible,
+.fmh-mobile-cta a:focus-visible {
+	outline: 3px solid var(--fmh-red);
+	outline-offset: 3px;
+	border-radius: 4px;
+}
+
+@media (max-width: 860px) {
+	.fmh-course-page > section { padding: 64px 0; }
+	.fmh-course-page > section.fmh-final { padding: 72px 0; }
+	/* Spazio per non far coprire l'ultima riga dalla CTA sticky. */
+	.fmh-course-page { padding-bottom: 84px; }
+}
+@media (max-width: 560px) {
+	.fmh-course-page > section { padding: 54px 0; }
+	.fmh-course-hero { padding: 40px 0 56px; }
+	/* Le date complete (giorno · città · orario) sono lunghe: su schermi
+	   stretti la pillola va a capo invece di forzare la riga. */
+	.fmh-course-page .fmh-date-badge {
+		display: block;
+		text-align: center;
+		font-size: .8rem;
+		padding: 8px 14px;
+		line-height: 1.45;
+	}
+	.fmh-hero-schedule { width: 100%; }
+	.fmh-course-book-card,
+	.fmh-session-card,
+	.fmh-practice-grid article,
+	.fmh-journey-grid article { padding: 26px 22px; }
+	.fmh-letter-paper { padding: 28px 20px; }
+	.fmh-sources { padding: 26px 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fmh-course-page *,
+	.fmh-course-modal *,
+	.fmh-mobile-cta { transition: none !important; scroll-behavior: auto !important; }
+	.fmh-course-page *:hover { transform: none !important; }
+}

@@ -1,0 +1,35 @@
+/*
+ * formalife-core — token di design condivisi (colori, font, spaziature).
+ *
+ * Definiti su :root: sono solo custom property (variabili), non regole
+ * visive — non applicano stili a nulla finché qualcosa non le richiama con
+ * var(...). Per questo è sicuro metterle su :root globale, a differenza
+ * delle classi in components.css che restano scoped/prefissate "fmls-"
+ * per non toccare il tema attivo o altri plugin.
+ *
+ * Valori migrati 1:1 da guida-antipanico-soffocamento v3.7.5 (prima fonte
+ * di questi colori/font): nessun valore reinventato in questa estrazione.
+ */
+:root {
+	--fmls-cream: #FFFDF7;
+	--fmls-cream-warm: #F5D9A8;
+	--fmls-teal-deep: #0B6560;
+	--fmls-teal-bright: #2CADA9;
+	--fmls-teal-darker: #084F4B;
+	--fmls-ink: #1A1A1A;
+	--fmls-ink-soft: #3A3A3A;
+	--fmls-terracotta: #C24E3A;
+	--fmls-white: #FFFFFF;
+	--fmls-border-soft: rgba(11,101,96,0.15);
+	--fmls-shadow-soft: 0 4px 20px rgba(11,101,96,0.08);
+	--fmls-shadow-card: 0 8px 30px rgba(11,101,96,0.12);
+	--fmls-radius: 20px;
+	--fmls-radius-sm: 12px;
+	--fmls-max-w: 1120px;
+	--fmls-font-display: 'Fredoka', 'Arial Rounded MT Bold', Arial, sans-serif;
+	--fmls-font-body: 'Karla', Arial, sans-serif;
+	--fmls-font-story: 'Lora', Georgia, serif;
+	--fmls-blue-dark: #14495C;
+	--fmls-orange: #E08A3C;
+	--fmls-yellow-light: #FCE9A8;
+}

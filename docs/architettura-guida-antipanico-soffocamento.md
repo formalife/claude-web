@@ -3,7 +3,7 @@ title: "Architettura — plugin guida-antipanico-soffocamento"
 progetto: "Formalife, Sviluppo Web & Plugin"
 tipo: "riferimento tecnico"
 status: "vivo (aggiornare ad ogni modifica strutturale)"
-versione_plugin_al: "3.7.5"
+versione_plugin_al: "3.7.6"
 ultimo_aggiornamento: "2026-09-10"
 ---
 
@@ -13,6 +13,12 @@ Mappa tecnica del plugin che gestisce landing, checkout Stripe e pagine legali d
 libro "La Guida Anti-Panico al Soffocamento Pediatrico". Obiettivo: chi riprende il
 lavoro (umano o Claude) capisce in due minuti dove intervenire, senza rileggere tutto
 il codice da capo.
+
+**Dipendenza (dalla v3.7.6):** questo plugin richiede `formalife-core` attivo
+(header `Requires Plugins`). Token di colore/font/spaziatura e le
+dichiarazioni `@font-face` vengono da lì — vedi
+`docs/architettura-formalife-core.md` per il dettaglio, e la sezione 3 di
+quel documento per cosa è stato migrato e cosa no in questa integrazione.
 
 **Se stai per modificare qualcosa che non trovi descritto qui, il documento è
 disallineato dal codice reale allegato in conversazione: fidati del codice, poi
@@ -87,6 +93,10 @@ bacheca proprio per questo scenario (`class-gaps-admin-notices.php`); se in futu
 sparisce o smette di comparire, è una regressione da correggere subito.
 
 ## 7. Changelog (sintesi — dettaglio completo in `readme.txt` del plugin)
+- **3.7.6** — Nuova dipendenza `formalife-core`: token colore/font/spaziatura
+  e font @font-face migrati lì (con fallback espliciti, zero cambiamento
+  visivo previsto). Classi CSS proprie (`gaps-*`) non toccate — vedi
+  `docs/architettura-formalife-core.md` §3.
 - **3.7.5** — Corretto il modello di repository: coordinamento in `claude-web`
   (§9), aggiornamento automatico spostato su un repository di distribuzione
   dedicato (`formalife/plugin-guida-al-soffocamento`), a seguito della scoperta che

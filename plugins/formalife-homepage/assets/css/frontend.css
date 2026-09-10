@@ -1,0 +1,808 @@
+/*
+ * Formalife Homepage — CSS frontend (v2.0.0)
+ * Ogni sezione ha classi e struttura proprie: nessun componente "card
+ * generica" riusato dodici volte. Stessa base tipografica/spaziature del
+ * plugin "Guida Anti-Panico al Soffocamento Pediatrico" (font, raggi,
+ * ombre, animazioni reveal), palette propria e indipendente:
+ *
+ *  - Blu autorevolezza  #1E3A5F (+ #142843 scuro, #EEF3F9 chiaro).
+ *  - Rosso accento/CTA  #C94A4A (+ #A33535 scuro, #FAEAEA chiaro) — SEMPRE
+ *    E SOLO sui pulsanti di azione.
+ *  - Verde sporadico     #2E7D5B (+ #1F5C41 scuro, #E6F4EC chiaro) — solo
+ *    nei blocchi di rassicurazione/garanzia, con parsimonia.
+ *  - Sfondo chiaro       #FBF8F4 (+ #F4EDE3 alternato).
+ *
+ * I colori del plugin del libro (teal/terracotta) compaiono SOLO nella
+ * sezione 5 ("Il libro"), l'unica interamente dedicata al libro: valori
+ * fissi definiti qui sotto, indipendenti dall'altro plugin.
+ *
+ * v4.6.4: i token realmente condivisi con formalife-core (font, raggi,
+ * larghezza massima, ink/white e i tre colori "libro", identici 1:1 ai
+ * token --fmls-* lì definiti) sono ora alias var(--fmls-*, <valore
+ * originale>) — un solo posto definisce quei valori, con fallback
+ * esplicito se formalife-core non fosse attivo. La palette propria (blu,
+ * rosso, verde, crema, ombre/bordi calcolati su di essa) resta invece
+ * scritta qui: è deliberatamente indipendente da formalife-core, non una
+ * duplicazione da eliminare — vedi il commento di apertura sopra.
+ */
+
+.fmh-nav, .fmh-home {
+	--fmh-cream: #FBF8F4;
+	--fmh-cream-alt: #F4EDE3;
+	--fmh-blue-deep: #1E3A5F;
+	--fmh-blue-darker: #142843;
+	--fmh-blue-light: #EEF3F9;
+	--fmh-red: #C94A4A;
+	--fmh-red-dark: #A33535;
+	--fmh-red-light: #FAEAEA;
+	--fmh-green: #2E7D5B;
+	--fmh-green-dark: #1F5C41;
+	--fmh-green-light: #E6F4EC;
+	--fmh-ink: var(--fmls-ink, #1A1A1A);
+	--fmh-ink-soft: var(--fmls-ink-soft, #3A3A3A);
+	--fmh-white: var(--fmls-white, #FFFFFF);
+	--fmh-border-soft: rgba(30,58,95,0.15);
+	--fmh-shadow-soft: 0 4px 20px rgba(30,58,95,0.08);
+	--fmh-shadow-card: 0 8px 30px rgba(30,58,95,0.12);
+	--fmh-radius: var(--fmls-radius, 20px);
+	--fmh-radius-sm: var(--fmls-radius-sm, 12px);
+	--fmh-max-w: var(--fmls-max-w, 1120px);
+	--fmh-font-display: var(--fmls-font-display, 'Fredoka', system-ui, sans-serif);
+	--fmh-font-body: var(--fmls-font-body, 'Karla', system-ui, sans-serif);
+	--fmh-font-story: var(--fmls-font-story, 'Lora', Georgia, serif);
+
+	/* Eccezione: colori del plugin del libro, solo per la sezione 5 — ora
+	   aliasati ai token condivisi di formalife-core (stesso valore,
+	   fallback esplicito). */
+	--fmh-book-teal: var(--fmls-teal-deep, #0B6560);
+	--fmh-book-teal-darker: var(--fmls-teal-darker, #084F4B);
+	--fmh-book-terracotta: var(--fmls-terracotta, #C24E3A);
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+.fmh-home {
+	font-family: var(--fmh-font-body);
+	background: var(--fmh-cream);
+	color: var(--fmh-ink);
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+	overflow-x: hidden;
+}
+.fmh-home, .fmh-home *, .fmh-home *::before, .fmh-home *::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+.fmh-home img { max-width: 100%; display: block; }
+.fmh-home a { text-decoration: none; }
+.fmh-home button { font: inherit; }
+.fmh-home section { scroll-margin-top: 24px; }
+
+.fmh-wrap { max-width: var(--fmh-max-w); margin: 0 auto; padding: 0 24px; }
+.fmh-home > section { padding: 84px 0; position: relative; }
+
+.fmh-home h1, .fmh-home h2, .fmh-home h3 {
+	font-family: var(--fmh-font-display);
+	color: var(--fmh-blue-deep);
+	line-height: 1.15;
+	font-weight: 600;
+}
+
+.fmh-eyebrow {
+	display: inline-block;
+	font-family: var(--fmh-font-body);
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	font-size: 0.78rem;
+	color: var(--fmh-blue-deep);
+	background: rgba(30,58,95,0.08);
+	padding: 6px 14px;
+	border-radius: 999px;
+	margin-bottom: 18px;
+}
+.fmh-eyebrow-center { display: table; margin-left: auto; margin-right: auto; }
+
+.fmh-visually-hidden {
+	position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+	overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ===== PULSANTI ===== */
+.fmh-btn-primary {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	background-color: var(--fmh-red);
+	color: #FFFFFF;
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 1.05rem;
+	padding: 17px 28px;
+	border-radius: 999px;
+	text-decoration: none;
+	box-shadow: var(--fmh-shadow-card);
+	transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+	border: none;
+	cursor: pointer;
+}
+.fmh-btn-primary:hover, .fmh-btn-primary:focus-visible {
+	background-color: var(--fmh-red-dark);
+	color: #FFFFFF;
+	transform: translateY(-2px);
+	box-shadow: 0 12px 34px rgba(169,53,53,0.3);
+}
+.fmh-btn-primary svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+.fmh-btn-outline {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	background-color: transparent;
+	color: var(--fmh-blue-deep);
+	border: 2px solid var(--fmh-blue-deep);
+	font-family: var(--fmh-font-display);
+	font-weight: 700;
+	font-size: 1.05rem;
+	padding: 15px 26px;
+	border-radius: 999px;
+	text-decoration: none;
+	transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+	cursor: pointer;
+}
+.fmh-btn-outline:hover, .fmh-btn-outline:focus-visible {
+	background-color: var(--fmh-blue-deep);
+	color: #FFFFFF;
+	transform: translateY(-2px);
+}
+.fmh-placeholder {
+	display: flex; align-items: center; justify-content: center;
+	background: rgba(30,58,95,0.06);
+	border: 2px dashed var(--fmh-border-soft);
+	border-radius: var(--fmh-radius);
+	color: var(--fmh-ink-soft);
+	font-size: 0.85rem; text-align: center; padding: 24px; min-height: 160px;
+}
+
+.fmh-reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fmh-reveal.is-visible { opacity: 1; transform: translateY(0); }
+.fmh-reveal-1.is-visible { transition-delay: 0.05s; }
+.fmh-reveal-2.is-visible { transition-delay: 0.15s; }
+.fmh-reveal-3.is-visible { transition-delay: 0.25s; }
+.fmh-reveal-4.is-visible { transition-delay: 0.35s; }
+.fmh-reveal-5.is-visible { transition-delay: 0.45s; }
+@media (prefers-reduced-motion: reduce) { .fmh-reveal { opacity: 1; transform: none; transition: none; } }
+
+.fmh-date-badge {
+	display: inline-flex; align-items: center; gap: 6px;
+	background: var(--fmh-blue-light); color: var(--fmh-blue-deep);
+	font-size: 0.85rem; font-weight: 700; padding: 8px 16px; border-radius: 999px;
+}
+
+/* ===== MENU SUPERIORE STICKY ===== */
+.fmh-nav {
+	position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.94);
+	backdrop-filter: saturate(180%) blur(8px); -webkit-backdrop-filter: saturate(180%) blur(8px);
+	border-bottom: 1px solid rgba(30,58,95,0.08); box-shadow: 0 2px 14px rgba(30,58,95,0.05);
+}
+.fmh-nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; gap: 24px; }
+.fmh-nav-logo { display: inline-flex; align-items: center; flex-shrink: 0; }
+.fmh-nav-logo img { max-height: 34px; width: auto; }
+.fmh-nav-logo-text { font-family: var(--fmh-font-display); font-weight: 700; font-size: 1.15rem; color: var(--fmh-blue-deep); }
+.fmh-nav-menu {
+	list-style: none; display: flex; align-items: center; gap: 32px;
+	margin: 0 auto 0 0; padding: 0; flex: 1; justify-content: center;
+}
+.fmh-nav-menu a {
+	font-family: var(--fmh-font-body); font-weight: 600; font-size: 0.94rem;
+	color: var(--fmh-ink-soft); text-decoration: none; padding: 6px 2px;
+	border-bottom: 2px solid transparent; transition: color 0.2s ease, border-color 0.2s ease;
+}
+.fmh-nav-menu a:hover, .fmh-nav-menu a:focus-visible { color: var(--fmh-blue-deep); border-color: var(--fmh-red); }
+@media (max-width: 640px) {
+	.fmh-nav-inner { padding: 10px 16px; gap: 12px; }
+	.fmh-nav-menu { gap: 16px; }
+	.fmh-nav-menu a { font-size: 0.86rem; }
+}
+
+/* =====================================================================
+   SEZIONE 1 — HERO
+   ===================================================================== */
+.fmh-hero {
+	padding: 72px 0 56px;
+	position: relative;
+	overflow: hidden;
+	background: radial-gradient(circle at 10% 12%, rgba(30,58,95,0.14) 0%, transparent 45%),
+		radial-gradient(circle at 92% 88%, rgba(201,74,74,0.12) 0%, transparent 45%),
+		linear-gradient(180deg, var(--fmh-cream) 0%, #fdf7ee 100%);
+}
+/* Il colore di sovrapposizione è il livello di base (opaco, z-index più
+   basso); l'immagine sta sopra con la propria opacità regolabile dal
+   pannello — così resta sempre visibile invece di sparire sotto un
+   overlay troppo coprente. */
+.fmh-hero-overlay { position: absolute; inset: 0; z-index: 0; }
+.fmh-hero-bg {
+	position: absolute; inset: -30px; z-index: 1;
+	background-size: cover; background-position: center;
+	transform: scale(1.05); /* compensa il filtro blur ai bordi */
+}
+.fmh-hero .fmh-wrap, .fmh-hero .fmh-hero-more { position: relative; z-index: 2; }
+.fmh-hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 64px; align-items: center; }
+.fmh-hero h1 { font-size: clamp(2rem, 3.6vw, 2.9rem); margin-bottom: 20px; letter-spacing: -0.01em; }
+.fmh-hero-title-blue { color: var(--fmh-blue-deep); }
+.fmh-hero-title-red { color: var(--fmh-red); }
+/* Nota: "ch" è relativo al font-size del proprio elemento, quindi
+   "max-width: 56ch" sul badge (font più piccolo) e sul testo (font più
+   grande) produceva due larghezze in pixel diverse. Per garantire che il
+   badge abbia davvero la stessa larghezza del testo sopra, usiamo lo
+   stesso valore fisso in px su entrambi, indipendente dal font-size. */
+.fmh-hero-sub { font-size: 1.15rem; line-height: 1.65; color: var(--fmh-ink-soft); max-width: 580px; margin-bottom: 18px; }
+.fmh-hero-body { font-size: 1rem; color: var(--fmh-ink-soft); max-width: 580px; margin-bottom: 20px; }
+.fmh-hero-badge {
+	display: flex; align-items: center; gap: 8px;
+	background: var(--fmh-white); border: 1px solid var(--fmh-border-soft);
+	color: var(--fmh-blue-deep); font-weight: 600; font-size: 0.86rem;
+	padding: 10px 16px; border-radius: 14px; box-shadow: var(--fmh-shadow-soft);
+	max-width: 580px; width: 100%; line-height: 1.5; margin-bottom: 30px; box-sizing: border-box;
+}
+.fmh-hero-cta-block { display: inline-flex; flex-direction: column; align-items: center; gap: 10px; }
+.fmh-hero-micro { font-size: 0.86rem; color: var(--fmh-ink-soft); text-align: center; }
+.fmh-hero-visual img { max-width: 78%; margin: 0 auto; border-radius: 16px; box-shadow: 0 24px 60px rgba(30,58,95,0.22); transform: rotate(-2deg); }
+.fmh-hero-visual .fmh-placeholder { max-width: 78%; margin: 0 auto; aspect-ratio: 0.707; transform: rotate(-2deg); }
+.fmh-hero-more { text-align: center; margin-top: 44px; padding: 0 24px; }
+.fmh-scroll-link {
+	display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 600;
+	color: var(--fmh-blue-deep); text-decoration: none; max-width: 90%;
+	padding: 10px 20px; border-radius: 999px; border: 1px solid transparent;
+	background: rgba(30,58,95,0.06);
+	transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+.fmh-scroll-link-arrow { display: inline-block; transition: transform 0.2s ease; }
+.fmh-scroll-link:hover, .fmh-scroll-link:focus-visible {
+	background: var(--fmh-blue-deep); color: #fff; transform: translateY(2px);
+	border-color: var(--fmh-blue-deep);
+}
+.fmh-scroll-link:hover .fmh-scroll-link-arrow { transform: translateY(3px); }
+
+@media (max-width: 860px) {
+	.fmh-hero-grid { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+	.fmh-hero-copy { display: flex; flex-direction: column; align-items: center; }
+	.fmh-hero-sub, .fmh-hero-body { margin-left: auto; margin-right: auto; }
+	.fmh-hero-cta-block { align-items: center; }
+	.fmh-hero-visual { order: -1; max-width: 240px; margin: 0 auto; }
+}
+
+/* =====================================================================
+   SEZIONE 2 — PERCHÉ ESISTE FORMALIFE
+   ===================================================================== */
+.fmh-why-section {
+	background: linear-gradient(160deg, var(--fmh-blue-deep) 0%, var(--fmh-blue-darker) 100%);
+	text-align: center;
+}
+.fmh-why-wrap { max-width: 720px; margin: 0 auto; }
+.fmh-why-section h2 { color: var(--fmh-cream); font-size: clamp(1.6rem, 2.8vw, 2.1rem); margin-bottom: 24px; }
+.fmh-why-section p { color: #fff; font-size: 1.08rem; margin-bottom: 18px; }
+.fmh-why-close {
+	font-family: var(--fmh-font-display); font-weight: 600; color: var(--fmh-cream) !important;
+	font-size: 1.1rem; margin-top: 8px !important; margin-bottom: 14px !important;
+}
+.fmh-why-goal {
+	font-family: var(--fmh-font-display); font-weight: 700; color: var(--fmh-cream) !important;
+	font-size: clamp(1.15rem, 2vw, 1.4rem); margin-bottom: 0 !important;
+}
+
+/* =====================================================================
+   SEZIONE 3 — C'È UNA DIFFERENZA TRA OSSERVARE E SAPER AGIRE
+   ===================================================================== */
+.fmh-diff-section {
+	text-align: center; position: relative; overflow: hidden;
+	background: radial-gradient(circle at 15% 20%, rgba(30,58,95,0.05) 0%, transparent 50%),
+		radial-gradient(circle at 88% 82%, rgba(46,125,91,0.05) 0%, transparent 50%),
+		var(--fmh-white);
+}
+.fmh-diff-wrap { max-width: 820px; margin: 0 auto; }
+.fmh-diff-section h2 { font-size: clamp(1.6rem, 2.8vw, 2.1rem); margin-bottom: 22px; }
+.fmh-diff-intro { color: var(--fmh-ink-soft); font-size: 1.08rem; max-width: 68ch; margin: 0 auto 52px; }
+.fmh-diff-panels { display: flex; align-items: stretch; gap: 24px; margin-bottom: 40px; }
+.fmh-diff-panel {
+	flex: 1; background: var(--fmh-cream); border-radius: var(--fmh-radius);
+	padding: 36px 28px; text-align: center; box-shadow: var(--fmh-shadow-soft);
+	border: 1px solid transparent; border-top: 4px solid var(--fmh-border-soft);
+	display: flex; flex-direction: column; align-items: center;
+	transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.fmh-diff-panel:hover { transform: translateY(-5px); box-shadow: var(--fmh-shadow-card); }
+.fmh-diff-panel--accent { background: var(--fmh-blue-light); border-top-color: var(--fmh-blue-deep); }
+.fmh-diff-icon {
+	display: inline-flex; align-items: center; justify-content: center;
+	width: 64px; height: 64px; border-radius: 50%; margin-bottom: 18px;
+	background: rgba(30,58,95,0.1); color: var(--fmh-blue-deep);
+	box-shadow: 0 0 0 6px rgba(30,58,95,0.05);
+}
+.fmh-diff-panel--accent .fmh-diff-icon { background: var(--fmh-blue-deep); color: #fff; box-shadow: 0 0 0 6px rgba(30,58,95,0.12); }
+.fmh-diff-icon svg { width: 28px; height: 28px; }
+.fmh-diff-label {
+	display: block; font-family: var(--fmh-font-display); font-weight: 700;
+	font-size: 1.25rem; color: var(--fmh-blue-deep); margin-bottom: 10px;
+	text-transform: uppercase; letter-spacing: 0.03em;
+}
+.fmh-diff-panel p { color: var(--fmh-ink-soft); font-size: 0.98rem; }
+.fmh-diff-arrow {
+	display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+	width: 40px; height: 40px; border-radius: 50%; background: var(--fmh-cream-alt);
+	font-size: 1.3rem; color: var(--fmh-blue-deep); align-self: center;
+}
+.fmh-diff-close {
+	font-family: var(--fmh-font-display); font-weight: 600; font-size: 1.15rem;
+	color: var(--fmh-blue-deep); max-width: 62ch; margin: 0 auto;
+	background: var(--fmh-blue-light); border-radius: var(--fmh-radius-sm);
+	padding: 20px 28px; display: inline-block;
+}
+@media (max-width: 700px) {
+	.fmh-diff-panels { flex-direction: column; }
+	.fmh-diff-arrow { transform: rotate(90deg); justify-content: center; margin: -6px 0; }
+}
+
+/* =====================================================================
+   SEZIONE 4 — OSSERVA. VALUTA. AGISCI.
+   Evidenziazione ciclica continua, discreta, senza interazione richiesta.
+   ===================================================================== */
+.fmh-triad-section { position: relative; overflow: hidden; background: var(--fmh-blue-light); text-align: center; padding-top: 64px; padding-bottom: 64px; }
+.fmh-triad-bg { position: absolute; inset: 0; z-index: 0; background-size: cover; background-position: center; }
+.fmh-triad-section .fmh-wrap { position: relative; z-index: 1; }
+.fmh-triad-words {
+	font-family: var(--fmh-font-display); font-weight: 700;
+	font-size: clamp(1.8rem, 4vw, 2.6rem); color: var(--fmh-blue-deep); margin-top: 8px;
+}
+.fmh-triad-word { display: inline-block; transition: color 0.4s ease, transform 0.4s ease; }
+.fmh-triad-word-1 { animation: fmh-triad-pulse 4.5s ease-in-out infinite; animation-delay: 0s; }
+.fmh-triad-word-2 { animation: fmh-triad-pulse 4.5s ease-in-out infinite; animation-delay: 1.5s; }
+.fmh-triad-word-3 { animation: fmh-triad-pulse 4.5s ease-in-out infinite; animation-delay: 3s; }
+@keyframes fmh-triad-pulse {
+	0%, 66%, 100% { color: var(--fmh-blue-deep); transform: scale(1); }
+	8%, 25% { color: var(--fmh-red); transform: scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+	.fmh-triad-word { animation: none !important; }
+}
+
+/* =====================================================================
+   SEZIONE 5 — QUAL È IL PROSSIMO PASSO? (router rapido libro/corso)
+   ===================================================================== */
+.fmh-next-section { background: var(--fmh-white); }
+.fmh-next-section h2 { text-align: center; font-size: clamp(1.6rem, 2.8vw, 2.1rem); margin-bottom: 44px; }
+.fmh-next-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; max-width: 960px; margin: 0 auto; }
+.fmh-next-card {
+	background: var(--fmh-cream); border: 1px solid var(--fmh-border-soft); border-radius: var(--fmh-radius); padding: 30px;
+	box-shadow: var(--fmh-shadow-soft); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px;
+}
+.fmh-next-card-image { width: 100%; aspect-ratio: 16/9; border-radius: var(--fmh-radius-sm); overflow: hidden; margin-bottom: 6px; }
+.fmh-next-card-image img { width: 100%; height: 100%; object-fit: cover; }
+.fmh-next-card--course { background: var(--fmh-blue-light); border: 2px dashed var(--fmh-blue-deep); justify-content: center; }
+.fmh-btn-navy {
+	display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+	background-color: var(--fmh-blue-deep); color: #fff;
+	font-family: var(--fmh-font-display); font-weight: 700; font-size: 1.05rem;
+	padding: 17px 28px; border-radius: 999px; text-decoration: none;
+	box-shadow: var(--fmh-shadow-card); transition: background-color 0.15s ease, transform 0.15s ease;
+	border: none; cursor: pointer;
+}
+.fmh-btn-navy:hover, .fmh-btn-navy:focus-visible { background-color: var(--fmh-blue-darker); color: #fff; transform: translateY(-2px); }
+.fmh-next-tag {
+	display: inline-block; font-family: var(--fmh-font-display); font-weight: 700; font-size: 0.76rem;
+	text-transform: uppercase; letter-spacing: 0.05em; color: var(--fmh-green-dark);
+	background: var(--fmh-green-light); padding: 6px 14px; border-radius: 999px;
+}
+.fmh-next-tag--course { color: var(--fmh-blue-deep); background: var(--fmh-white); }
+.fmh-next-card h3 { font-size: 1.25rem; }
+.fmh-next-card p { color: var(--fmh-ink-soft); font-size: 0.98rem; flex-grow: 1; }
+@media (max-width: 760px) { .fmh-next-grid { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   SEZIONE 6 — IL LIBRO (offerta) — eccezione cromatica: teal/terracotta
+   ===================================================================== */
+.fmh-book-section { background: var(--fmh-cream-alt); }
+.fmh-book-card {
+	max-width: 960px; margin: 0 auto; background: var(--fmh-white);
+	border-radius: var(--fmh-radius); box-shadow: var(--fmh-shadow-card);
+	padding: 44px; display: grid; grid-template-columns: 260px 1fr; gap: 44px;
+	border-top: 6px solid var(--fmh-book-teal);
+}
+.fmh-book-visual {
+	display: flex; flex-direction: column; align-items: center; justify-content: center;
+	gap: 18px; height: 100%;
+}
+.fmh-book-visual img { border-radius: var(--fmh-radius-sm); box-shadow: var(--fmh-shadow-card); width: 100%; }
+.fmh-book-visual-secondary { max-width: 78%; opacity: 0.94; }
+.fmh-book-content h2 { color: var(--fmh-book-teal); font-size: 1.5rem; margin-bottom: 22px; }
+.fmh-book-list { list-style: none; margin-bottom: 26px; }
+.fmh-book-list li { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.fmh-book-list li:last-child { margin-bottom: 0; }
+.fmh-book-list-label {
+	font-family: var(--fmh-font-display); font-weight: 700; font-size: 0.82rem;
+	text-transform: uppercase; letter-spacing: 0.04em; color: var(--fmh-book-teal);
+}
+.fmh-book-list li span:last-child { color: var(--fmh-ink-soft); font-size: 0.98rem; }
+.fmh-book-price-row {
+	display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+	gap: 18px; background: rgba(11,101,96,0.06); border-radius: var(--fmh-radius-sm);
+	padding: 20px 24px; margin-bottom: 22px;
+}
+.fmh-book-price-block { display: flex; flex-direction: column; }
+.fmh-book-price { font-family: var(--fmh-font-display); font-size: 2.2rem; font-weight: 700; color: var(--fmh-book-terracotta); line-height: 1; }
+.fmh-book-price-note { font-size: 0.82rem; color: var(--fmh-ink-soft); margin-top: 6px; max-width: 32ch; }
+.fmh-book-dates { display: flex; flex-direction: column; gap: 8px; }
+.fmh-book-dates .fmh-date-badge { background: rgba(11,101,96,0.1); color: var(--fmh-book-teal); }
+.fmh-book-guarantee {
+	display: flex; gap: 14px; align-items: flex-start; background: var(--fmh-green-light);
+	border-radius: var(--fmh-radius-sm); padding: 18px 20px; margin-bottom: 26px;
+}
+.fmh-book-guarantee-icon { font-size: 1.4rem; flex-shrink: 0; }
+.fmh-book-guarantee p { color: var(--fmh-green-dark); font-size: 0.92rem; font-weight: 500; }
+@media (max-width: 760px) {
+	.fmh-book-card { grid-template-columns: 1fr; padding: 30px 24px; text-align: center; }
+	.fmh-book-visual img { max-width: 180px; margin: 0 auto; }
+	.fmh-book-list li { align-items: center; }
+	.fmh-book-price-row { flex-direction: column; text-align: center; }
+	.fmh-book-dates { align-items: center; }
+}
+
+/* =====================================================================
+   SEZIONE 6 — IL CORSO PRATICO (in arrivo + lista d'attesa)
+   ===================================================================== */
+.fmh-waitlist-section { position: relative; overflow: hidden; background: var(--fmh-white); }
+.fmh-waitlist-bg { position: absolute; inset: 0; z-index: 0; background-size: cover; background-position: center; opacity: 0.1; }
+.fmh-waitlist-section .fmh-wrap { position: relative; z-index: 1; }
+.fmh-waitlist-card {
+	max-width: 700px; margin: 0 auto; background: var(--fmh-cream);
+	border: 2px dashed var(--fmh-blue-deep); border-radius: var(--fmh-radius);
+	padding: 44px; position: relative;
+}
+.fmh-waitlist-tag {
+	position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+	background: var(--fmh-blue-deep); color: #fff; font-family: var(--fmh-font-display);
+	font-weight: 700; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase;
+	padding: 7px 20px; border-radius: 999px; white-space: nowrap;
+}
+.fmh-waitlist-card h2 { text-align: center; font-size: clamp(1.35rem, 2.4vw, 1.8rem); margin: 10px 0 26px; }
+.fmh-waitlist-features { list-style: none; margin-bottom: 22px; }
+.fmh-waitlist-features li { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; color: var(--fmh-ink-soft); font-size: 0.96rem; }
+.fmh-waitlist-features li span { font-size: 1.2rem; }
+.fmh-waitlist-note { color: var(--fmh-ink-soft); margin-bottom: 26px; font-size: 0.98rem; }
+.fmh-waitlist-form-row { display: flex; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.fmh-waitlist-form-row input {
+	flex: 1; min-width: 200px; padding: 13px 16px; border-radius: 10px;
+	border: 1px solid var(--fmh-border-soft); font-size: 0.95rem; font-family: inherit; background: #fff;
+}
+.fmh-waitlist-form-row input:focus { outline: 2px solid var(--fmh-blue-deep); outline-offset: 1px; }
+.fmh-waitlist-consent { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 20px; }
+.fmh-waitlist-consent input { margin-top: 4px; }
+.fmh-waitlist-consent label { font-size: 0.8rem; color: var(--fmh-ink-soft); line-height: 1.5; }
+.fmh-waitlist-form .fmh-btn-primary { width: 100%; justify-content: center; }
+.fmh-waitlist-message { margin-top: 14px; font-size: 0.9rem; text-align: center; min-height: 1.3em; }
+.fmh-waitlist-message--success { color: var(--fmh-green-dark); font-weight: 600; }
+.fmh-waitlist-message--error { color: var(--fmh-red-dark); font-weight: 600; }
+@media (max-width: 600px) { .fmh-waitlist-card { padding: 34px 24px; } }
+
+/* =====================================================================
+   SEZIONE 8 — FORMALIFE ACCOMPAGNA LA FAMIGLIA (momenti della crescita)
+   Box ridisegnati: niente icona, testo più grande e centrato
+   verticalmente, box più alti, sfondo immagine al 15% di opacità, hover
+   con colore pieno (blu/verde scuro alternati) + testo bianco + scale.
+   ===================================================================== */
+.fmh-moments-section { background: var(--fmh-cream-alt); }
+.fmh-moments-section h2 { text-align: center; font-size: clamp(1.6rem, 2.8vw, 2.1rem); margin-bottom: 48px; max-width: 46ch; margin-left: auto; margin-right: auto; }
+.fmh-moments-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px; }
+.fmh-moment-card {
+	position: relative; overflow: hidden; min-height: 240px; border-radius: var(--fmh-radius-sm);
+	background: var(--fmh-white); box-shadow: var(--fmh-shadow-soft);
+	display: flex; align-items: center; justify-content: center; text-align: center;
+	transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+}
+.fmh-moment-bg {
+	position: absolute; inset: 0; background-size: cover; background-position: center;
+	opacity: 0.15; transition: opacity 0.25s ease;
+}
+.fmh-moment-content { position: relative; z-index: 1; padding: 32px 28px; }
+.fmh-moment-card h3 {
+	font-size: 1.2rem; margin-bottom: 12px; transition: color 0.25s ease;
+}
+.fmh-moment-card p { color: var(--fmh-ink-soft); font-size: 1rem; transition: color 0.25s ease; }
+.fmh-moment-card:hover { transform: scale(1.035); box-shadow: var(--fmh-shadow-card); }
+.fmh-moment-card--blue:hover { background-color: var(--fmh-blue-deep); }
+.fmh-moment-card--green:hover { background-color: var(--fmh-green-dark); }
+.fmh-moment-card:hover .fmh-moment-bg { opacity: 0.18; }
+.fmh-moment-card:hover h3, .fmh-moment-card:hover p { color: #fff; }
+.fmh-moments-close {
+	text-align: center; font-family: var(--fmh-font-display); font-weight: 600;
+	font-size: 1.1rem; color: var(--fmh-blue-deep); max-width: 56ch; margin: 0 auto;
+}
+@media (max-width: 860px) { .fmh-moments-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .fmh-moments-grid { grid-template-columns: 1fr; } .fmh-moment-card { min-height: 200px; } }
+
+/* =====================================================================
+   SEZIONE 8 — PER ASILI, AZIENDE E PROFESSIONISTI (B2B)
+   ===================================================================== */
+.fmh-b2b-section { background: var(--fmh-blue-light); }
+.fmh-b2b-wrap { display: flex; align-items: center; gap: 36px; }
+.fmh-b2b-icon { font-size: 2.6rem; flex-shrink: 0; }
+.fmh-b2b-image { flex-shrink: 0; width: 120px; height: 120px; border-radius: var(--fmh-radius); overflow: hidden; box-shadow: var(--fmh-shadow-card); }
+.fmh-b2b-image img { width: 100%; height: 100%; object-fit: cover; }
+.fmh-b2b-text { flex: 1; }
+.fmh-b2b-text h2 { font-size: clamp(1.3rem, 2.2vw, 1.7rem); margin-bottom: 14px; }
+.fmh-b2b-text p { color: var(--fmh-ink-soft); margin-bottom: 8px; max-width: 68ch; }
+.fmh-b2b-cta { display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+.fmh-btn-whatsapp, .fmh-btn-gmail {
+	display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+	font-family: var(--fmh-font-display); font-weight: 700; font-size: 1rem;
+	padding: 14px 24px; border-radius: 999px; text-decoration: none;
+	box-shadow: var(--fmh-shadow-soft); transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.fmh-btn-whatsapp svg, .fmh-btn-gmail svg { width: 22px; height: 22px; flex-shrink: 0; }
+.fmh-btn-whatsapp { background-color: #25D366; color: #fff; }
+.fmh-btn-whatsapp:hover, .fmh-btn-whatsapp:focus-visible { background-color: #1EBE59; color: #fff; transform: translateY(-2px); }
+.fmh-btn-gmail { background-color: #fff; color: var(--fmh-ink); border: 1px solid var(--fmh-border-soft); }
+.fmh-btn-gmail:hover, .fmh-btn-gmail:focus-visible { background-color: var(--fmh-cream-alt); color: var(--fmh-ink); transform: translateY(-2px); }
+@media (max-width: 760px) {
+	.fmh-b2b-wrap { flex-direction: column; text-align: center; }
+	.fmh-b2b-cta { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+}
+
+/* =====================================================================
+   SEZIONE 9 — LA GARANZIA (ledger a due colonne)
+   ===================================================================== */
+.fmh-guarantee-section { background: var(--fmh-white); }
+.fmh-guarantee-section h2 { text-align: center; font-size: clamp(1.6rem, 2.8vw, 2.1rem); margin-bottom: 46px; }
+.fmh-guarantee-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; max-width: 960px; margin: 0 auto; }
+.fmh-guarantee-col {
+	border-radius: var(--fmh-radius); padding: 38px 34px; box-shadow: var(--fmh-shadow-soft);
+	transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.fmh-guarantee-col:hover { transform: translateY(-4px); box-shadow: var(--fmh-shadow-card); }
+.fmh-guarantee-col--yes { background: var(--fmh-green-light); border: 1px solid rgba(46,125,91,0.2); }
+.fmh-guarantee-col--no { background: var(--fmh-blue-light); border: 1px solid var(--fmh-border-soft); }
+.fmh-guarantee-col-icon {
+	display: inline-flex; align-items: center; justify-content: center;
+	width: 52px; height: 52px; border-radius: 50%; margin-bottom: 16px;
+}
+.fmh-guarantee-col-icon svg { width: 26px; height: 26px; }
+.fmh-guarantee-col--yes .fmh-guarantee-col-icon { background: rgba(46,125,91,0.14); color: var(--fmh-green-dark); }
+.fmh-guarantee-col--no .fmh-guarantee-col-icon { background: rgba(30,58,95,0.1); color: var(--fmh-blue-deep); }
+.fmh-guarantee-col-tag {
+	display: block; font-family: var(--fmh-font-display); font-weight: 700;
+	font-size: 1.15rem; margin-bottom: 20px;
+}
+.fmh-guarantee-col--yes .fmh-guarantee-col-tag { color: var(--fmh-green-dark); }
+.fmh-guarantee-col--no .fmh-guarantee-col-tag { color: var(--fmh-blue-deep); }
+.fmh-guarantee-list { list-style: none; margin-bottom: 22px; }
+.fmh-guarantee-list li {
+	display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+	color: var(--fmh-green-dark); font-weight: 600; font-size: 0.96rem;
+}
+.fmh-guarantee-list li span { font-size: 1.15rem; }
+.fmh-guarantee-quote {
+	font-family: var(--fmh-font-story); font-style: italic; font-size: 1.02rem;
+	color: var(--fmh-blue-deep); margin-bottom: 16px; line-height: 1.6;
+}
+.fmh-guarantee-note { font-size: 0.9rem; line-height: 1.55; }
+.fmh-guarantee-col--yes .fmh-guarantee-note { color: var(--fmh-green-dark); opacity: 0.9; }
+.fmh-guarantee-col--no .fmh-guarantee-note { color: var(--fmh-ink-soft); }
+@media (max-width: 760px) { .fmh-guarantee-columns { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   SEZIONE 11 — CHI C'È DIETRO FORMALIFE
+   Layout basato su "gaps-author-section" (plugin del libro): foto più
+   piccola, testo più ampio, nessun badge — ripetuto una volta per membro.
+   ===================================================================== */
+.fmh-team-section { position: relative; overflow: hidden; background: var(--fmh-cream-alt); text-align: center; }
+.fmh-team-bg { position: absolute; inset: 0; z-index: 0; background-size: cover; background-position: center; }
+.fmh-team-section .fmh-wrap { position: relative; z-index: 1; }
+.fmh-team-title {
+	font-family: var(--fmh-font-display); text-align: center;
+	font-size: clamp(1.6rem, 2.8vw, 2.1rem); max-width: 44ch; margin: 0 auto 56px;
+}
+.fmh-team-rows { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+.fmh-team-row {
+	display: grid; grid-template-columns: 168px 1fr; gap: 36px; align-items: center;
+	background: var(--fmh-white); border-radius: var(--fmh-radius); padding: 30px 36px;
+	box-shadow: var(--fmh-shadow-soft); text-align: left;
+}
+.fmh-team-row-photo { width: 168px; height: 168px; border-radius: 50%; overflow: hidden; box-shadow: var(--fmh-shadow-card); }
+.fmh-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+.fmh-avatar-fallback {
+	width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+	background: var(--fmh-blue-deep); color: #fff; font-family: var(--fmh-font-display);
+	font-size: 1.7rem; font-weight: 700;
+}
+.fmh-team-row-text h3 { font-size: 1.2rem; margin-bottom: 4px; }
+.fmh-team-role {
+	display: block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+	letter-spacing: 0.04em; color: var(--fmh-red); margin-bottom: 12px;
+}
+.fmh-team-row-text p { color: var(--fmh-ink-soft); font-size: 0.98rem; max-width: 56ch; }
+@media (max-width: 640px) {
+	.fmh-team-row { grid-template-columns: 1fr; text-align: center; padding: 30px 24px; }
+	.fmh-team-row-photo { width: 120px; height: 120px; margin: 0 auto; }
+	.fmh-team-row-text p { max-width: 100%; }
+}
+
+/* =====================================================================
+   SEZIONE 12 — CAROSELLO CORSI DAL VIVO
+   Sfondo a rotazione automatica (crossfade CSS puro), nessun controllo.
+   ===================================================================== */
+.fmh-carousel-section {
+	position: relative; height: 58vh; min-height: 340px; max-height: 620px;
+	overflow: hidden; background: var(--fmh-blue-darker);
+}
+.fmh-carousel-track { display: flex; height: 100%; animation: fmh-carousel-scroll 26s linear infinite; }
+.fmh-carousel-slide { flex-shrink: 0; height: 100%; background-size: cover; background-position: center; }
+@keyframes fmh-carousel-scroll {
+	from { transform: translateX(0); }
+	to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+	.fmh-carousel-track { animation: none; }
+}
+@media (max-width: 640px) {
+	.fmh-carousel-section { height: 42vh; min-height: 240px; }
+	.fmh-carousel-track { animation-duration: 18s; }
+}
+
+/* =====================================================================
+   SEZIONE 13 — TRASPARENZA SULLE FONTI (statistiche)
+   ===================================================================== */
+.fmh-cost-section { background: var(--fmh-cream-alt); text-align: center; }
+.fmh-cost-section h2 { font-size: clamp(1.6rem, 2.8vw, 2.1rem); margin-bottom: 14px; }
+.fmh-cost-intro { color: var(--fmh-ink-soft); font-size: 1.02rem; max-width: 62ch; margin: 0 auto 40px; }
+.fmh-stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-bottom: 8px; }
+.fmh-stat-card {
+	background: var(--fmh-white); border-radius: var(--fmh-radius-sm); padding: 30px 20px;
+	box-shadow: var(--fmh-shadow-soft);
+}
+.fmh-stat-icon { display: block; font-size: 1.6rem; margin-bottom: 8px; }
+.fmh-stat-number { display: block; font-family: var(--fmh-font-display); font-size: 2.4rem; font-weight: 700; color: var(--fmh-blue-deep); margin-bottom: 10px; }
+.fmh-stat-label { font-size: 0.9rem; color: var(--fmh-ink-soft); }
+.fmh-stat-source { font-size: 0.78rem; color: var(--fmh-ink-soft); opacity: 0.75; margin-bottom: 40px; }
+.fmh-cost-body { max-width: 68ch; margin: 0 auto; color: var(--fmh-ink-soft); font-size: 1.05rem; }
+.fmh-cost-body p { margin-bottom: 16px; }
+.fmh-cost-final {
+	font-family: var(--fmh-font-display); font-weight: 600; color: var(--fmh-blue-deep);
+	font-size: 1.15rem; margin-top: 24px; line-height: 1.7;
+}
+.fmh-cost-final strong { color: var(--fmh-blue-darker); }
+@media (max-width: 760px) { .fmh-stat-row { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   SEZIONE 11 — FAQ
+   ===================================================================== */
+.fmh-faq-section { background: var(--fmh-white); }
+.fmh-faq-section h2 { text-align: center; font-size: clamp(1.5rem, 2.6vw, 2rem); margin-bottom: 40px; }
+.fmh-faq-list { max-width: 720px; margin: 0 auto; }
+.fmh-faq-item {
+	border: 1px solid var(--fmh-border-soft); border-radius: var(--fmh-radius-sm);
+	margin-bottom: 14px; overflow: hidden; transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.fmh-faq-item:hover { border-color: var(--fmh-blue-deep); box-shadow: var(--fmh-shadow-soft); }
+.fmh-faq-item summary {
+	cursor: pointer; padding: 18px 22px; font-family: var(--fmh-font-display); font-weight: 600;
+	color: var(--fmh-blue-deep); font-size: 1.02rem; list-style: none; display: flex;
+	align-items: center; gap: 14px; transition: background 0.2s ease;
+}
+.fmh-faq-item summary:hover { background: rgba(30,58,95,0.05); }
+.fmh-faq-item summary::-webkit-details-marker { display: none; }
+.fmh-faq-number {
+	flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--fmh-blue-light);
+	color: var(--fmh-blue-deep); font-size: 0.8rem; font-weight: 700; display: flex;
+	align-items: center; justify-content: center;
+}
+.fmh-faq-item summary .fmh-faq-q { flex: 1; }
+.fmh-faq-item summary::after { content: "+"; font-size: 1.4rem; color: var(--fmh-red); flex-shrink: 0; transition: transform 0.2s ease; }
+.fmh-faq-item[open] summary::after { transform: rotate(45deg); }
+.fmh-faq-item[open] summary { background: rgba(30,58,95,0.07); }
+.fmh-faq-item p { padding: 12px 22px 22px 64px; color: var(--fmh-ink-soft); animation: fmh-faq-fade 0.3s ease; }
+.fmh-faq-item p a { color: var(--fmh-blue-deep); text-decoration: underline; }
+@keyframes fmh-faq-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* =====================================================================
+   SEZIONE 12 — CHIUSURA E CONTATTI
+   ===================================================================== */
+.fmh-closing-section {
+	background: linear-gradient(160deg, var(--fmh-blue-deep) 0%, var(--fmh-blue-darker) 100%);
+	color: #fff; text-align: center; padding-top: 84px; padding-bottom: 84px;
+}
+.fmh-closing-section h2 { color: #fff; font-size: clamp(1.5rem, 2.8vw, 2rem); margin-bottom: 32px; }
+.fmh-closing-cta-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin-bottom: 44px; }
+.fmh-closing-section .fmh-btn-outline { color: #fff; border-color: rgba(255,255,255,0.6); }
+.fmh-closing-section .fmh-btn-outline:hover { background: rgba(255,255,255,0.14); color: #fff; border-color: #fff; }
+
+/* Pulsante "cream": stesso font/dimensioni/forma degli altri pulsanti,
+   cambiano solo i colori — invito pacato, non un'azione rossa urgente. */
+.fmh-btn-cream {
+	display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+	background-color: var(--fmh-cream); color: var(--fmh-blue-deep);
+	font-family: var(--fmh-font-display); font-weight: 700; font-size: 1.05rem;
+	padding: 17px 28px; border-radius: 999px; text-decoration: none;
+	box-shadow: var(--fmh-shadow-card);
+	transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+	border: none; cursor: pointer;
+}
+.fmh-btn-cream:hover, .fmh-btn-cream:focus-visible {
+	background-color: var(--fmh-cream-alt); color: var(--fmh-blue-deep);
+	transform: translateY(-2px); box-shadow: 0 12px 34px rgba(0,0,0,0.18);
+}
+
+/* Box P.S. — molto più risaltato: cornice cream piena (non un riquadro
+   scuro semi-trasparente), bordo rosso in evidenza, etichetta "P.S."
+   come badge a sé, per farlo emergere invece di confondersi nello sfondo. */
+.fmh-ps-box {
+	max-width: 680px; margin: 0 auto; background: var(--fmh-cream);
+	border: 2px solid var(--fmh-red); border-radius: var(--fmh-radius);
+	padding: 38px 40px; text-align: left; box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+	position: relative;
+}
+.fmh-ps-badge {
+	position: absolute; top: -18px; left: 40px;
+	background: var(--fmh-red); color: #fff; font-family: var(--fmh-font-display);
+	font-weight: 700; font-size: 0.85rem; letter-spacing: 0.04em;
+	padding: 7px 18px; border-radius: 999px; box-shadow: var(--fmh-shadow-soft);
+}
+.fmh-ps-box p { color: var(--fmh-ink); font-size: 1.02rem; margin-bottom: 16px; margin-top: 10px; }
+.fmh-ps-box p:last-of-type { margin-bottom: 0; }
+.fmh-ps-box strong { color: var(--fmh-red-dark); }
+.fmh-ps-cta-wrap { margin-top: 24px; text-align: center; }
+@media (max-width: 640px) { .fmh-ps-box { padding: 32px 26px; } .fmh-ps-badge { left: 26px; } }
+
+/* Sezione contatti finali — copiata identica dalla sezione contatti della
+   landing del libro (stessa struttura, stesso pill/icone), cambia solo il
+   testo del titolo e il colore: qui bordo/ombre sono già in tinta navy
+   (var(--fmh-border-soft) / var(--fmh-shadow-soft) / var(--fmh-shadow-card))
+   invece della tinta verde usata nella landing del libro. */
+.fmh-contact-section { background: var(--fmh-cream); text-align: center; }
+.fmh-contact-section h2 { font-size: clamp(1.2rem, 2vw, 1.5rem); margin-bottom: 26px; }
+.fmh-contact-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; margin-bottom: 34px; }
+.fmh-contact-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	background: var(--fmh-white);
+	border: 1px solid var(--fmh-border-soft);
+	color: var(--fmh-ink);
+	font-weight: 600;
+	font-size: 0.94rem;
+	padding: 10px 20px 10px 10px;
+	border-radius: 999px;
+	text-decoration: none;
+	box-shadow: var(--fmh-shadow-soft);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.fmh-contact-pill:hover { transform: translateY(-3px); box-shadow: var(--fmh-shadow-card); }
+.fmh-contact-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+.fmh-contact-icon svg { width: 100%; height: 100%; }
+.fmh-contact-logo { max-width: 160px; margin: 0 auto; opacity: 0.9; }
+
+.fmh-footer {
+	text-align: center; padding: 22px 24px; font-size: 0.78rem; color: var(--fmh-ink-soft);
+	background: var(--fmh-cream); border-top: 1px solid var(--fmh-border-soft);
+	display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 12px;
+}
+.fmh-footer a { color: var(--fmh-blue-deep); text-decoration: underline; }
+.fmh-footer-sep { opacity: 0.5; }
+
+@media (max-width: 640px) {
+	.fmh-home > section { padding: 56px 0; }
+	.fmh-closing-cta-row { flex-direction: column; align-items: center; }
+	.fmh-closing-cta-row .fmh-btn-primary, .fmh-closing-cta-row .fmh-btn-outline, .fmh-closing-cta-row .fmh-btn-cream { width: 100%; max-width: 360px; }
+}
+
+/* .fmh-btn-lg va tenuto per ultimo nel foglio di stile: essendo un
+   modificatore a singola classe, con la stessa specificità di
+   .fmh-btn-primary/.fmh-btn-cream/.fmh-btn-navy ecc., l'ordine nel file
+   decide il vincitore a parità di specificità. Messo qui in fondo vince
+   sempre su font-size/padding di qualunque variante di colore venga
+   combinata con esso, cosi il pulsante cream "grande" ha davvero le
+   stesse dimensioni degli altri pulsanti .fmh-btn-lg accanto a lui. */
+.fmh-btn-lg { font-size: 1.2rem; padding: 22px 40px; }
