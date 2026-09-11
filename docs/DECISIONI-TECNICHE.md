@@ -67,7 +67,33 @@ non si rispiega da zero ogni volta e non si ripetono errori già risolti.
   non richiesta dentro una sessione dedicata a un incidente di sicurezza su
   un plugin di pagamenti live. Resta un passo esplicito separato.
 
-### 2026-09-10 · Bug: pagamenti Stripe non registrati come "Pagato"
+### 2026-09-11 · Landing del corso: stile core esatto invece di palette propria
+- **Decisione:** la landing e la pagina di conferma del corso pratico
+  (`genitori-pronti`, `corso-confermato` — file `course.css`) non usano più
+  la palette propria blu/rosso/verde di `formalife-homepage`, ma ereditano
+  **esattamente** i colori di formalife-core (crema/teal/terracotta,
+  l'identità del libro). Confermato esplicitamente dal proprietario,
+  incluso che il pulsante di acquisto diventi **terracotta** (era rosso, una
+  scelta di conversione deliberata in origine).
+- **Perimetro:** solo il corso. La homepage generale (`home`, `frontend.css`)
+  **non è toccata**: mantiene la propria palette indipendente, come da
+  readme del plugin.
+- **Verde di rassicurazione:** non esiste nella palette di formalife-core.
+  Su richiesta del proprietario, promosso a token condiviso ufficiale
+  (`--fmls-green-reassure`/`-dark`/`-light`, formalife-core v1.1.0) invece
+  di essere sostituito con un colore core esistente o lasciato come
+  eccezione locale — valore migrato 1:1 da quello già in uso, non inventato.
+- **Tipo:** funzionalità (design/UI).
+- **Toccati:** `plugins/formalife-core/assets/css/tokens.css`,
+  `formalife-core.php`, `readme.txt` (v1.0.0 → v1.1.0).
+  `plugins/formalife-homepage/assets/css/course.css`, `formalife-homepage.php`,
+  `readme.txt` (v4.6.5 → v4.6.6). Dettaglio mappatura completo in
+  `docs/architettura-formalife-homepage.md` §4bis.
+- **Non ancora fatto:** nessuna verifica visiva dal vivo (nessun accesso al
+  sito in questa sessione) — controllare dopo il deploy soprattutto
+  contrasto/leggibilità del testo bianco sul nuovo pulsante terracotta.
+
+### 2026-09-11 · Incidente: uninstall.php ha cancellato dati reali su formalife-homepage
 - **Decisione:** il pannello impostazioni ora avvisa esplicitamente (avviso dedicato,
   visibile in tutta la bacheca) quando le chiavi Stripe sono configurate ma manca la
   chiave segreta del webhook — causa più comune del sintomo "il cliente ha pagato ma

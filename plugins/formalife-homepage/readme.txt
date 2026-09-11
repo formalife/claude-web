@@ -4,7 +4,7 @@ Tags: homepage, landing page, formalife
 Requires at least: 6.0
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 4.6.5
+Stable tag: 4.6.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,14 +20,18 @@ Dalla versione 4.0 il plugin gestisce la landing `genitori-pronti` del Corso Ant
 
 = Palette colori =
 
-Su richiesta, questo plugin usa una palette indipendente da quella del libro:
+**Homepage (`home`)**: palette indipendente da quella del libro:
 
 * Blu autorevolezza — #1E3A5F (scuro #142843, chiaro #EEF3F9): titoli e superfici ampie (hero, sezione finale, footer).
 * Rosso accento/CTA — #C94A4A (scuro #A33535, chiaro #FAEAEA): usato sempre e solo per i pulsanti di azione.
 * Verde sporadico — #2E7D5B (scuro #1F5C41, chiaro #E6F4EC): usato con parsimonia, alternato al blu, solo nei badge di rassicurazione della sezione "Perché fidarti di Formalife".
 * Sfondo chiaro — #FBF8F4 (alternato #F4EDE3).
 
-I colori del plugin del libro (teal #0B6560 / terracotta #C24E3A) compaiono solo nella card "Il libro" della sezione "Le nostre soluzioni", come unica eccezione prevista: sono valori fissi definiti in questo stesso plugin (nessuna dipendenza diretta dall'altro), usati solo quando la pagina fa esplicito riferimento al libro. Non sono presenti campi colore nel pannello impostazioni: la palette è intenzionalmente fissa via CSS, per garantire che venga sempre rispettata.
+I colori del plugin del libro (teal #0B6560 / terracotta #C24E3A) compaiono solo nella card "Il libro" della sezione "Le nostre soluzioni", come unica eccezione prevista: sono valori fissi definiti in questo stesso plugin (nessuna dipendenza diretta dall'altro), usati solo quando la pagina fa esplicito riferimento al libro.
+
+**Landing e conferma del corso (`genitori-pronti`, `corso-confermato`)**: dalla v4.6.6, **stile core esatto** — non più questa palette propria, ma gli stessi colori di formalife-core (crema/teal/terracotta, l'identità del libro), ereditati via token `--fmls-*` con fallback esplicito. Decisione esplicita del proprietario: coerenza visiva totale col libro sull'intero funnel del corso, pulsante di acquisto incluso (ora terracotta, non più rosso). Il verde di rassicurazione dei badge di garanzia è stato promosso a token condiviso (`--fmls-green-reassure`) in formalife-core v1.1.0. Vedi `docs/architettura-formalife-homepage.md` §4bis nel repository di coordinamento.
+
+Non sono presenti campi colore nel pannello impostazioni: la palette è intenzionalmente fissa via CSS, per garantire che venga sempre rispettata.
 
 = Dove trovare le impostazioni =
 
@@ -42,6 +46,11 @@ Bacheca WordPress → menu laterale "Formalife Home" (icona casa). In cima alla 
 5. Vai su Bacheca → Impostazioni → Lettura e imposta "Home" come pagina iniziale del sito, se non lo è già.
 
 == Changelog ==
+
+= 4.6.6 =
+* La landing e la pagina di conferma del corso pratico adottano lo stile core esatto di formalife-core (crema/teal/terracotta) al posto della palette propria blu/rosso/verde — decisione esplicita del proprietario. Il pulsante di acquisto diventa terracotta (era rosso). Homepage generale non toccata: mantiene la propria palette.
+* Nuovi token condivisi in formalife-core v1.1.0 (`--fmls-green-reassure`/`-dark`/`-light`) per il verde dei badge di garanzia, migrati 1:1 dal valore già in uso qui.
+* Nessuna modifica a checkout, prezzi, PaymentIntent, webhook Stripe, email, logica di capienza o contenuti testuali.
 
 = 4.6.5 =
 * Sicurezza: disinstallare il plugin (Bacheca → Plugin → Elimina) non cancella più automaticamente impostazioni (comprese le chiavi Stripe), iscrizioni al corso e pagine generate. Serve prima spuntare "Cancella i dati alla disinstallazione" in impostazioni (falsa di default). Prima di questa versione, eliminare il plugin per sostituirlo con uno zip più recente cancellava questi dati senza preavviso.

@@ -4,7 +4,7 @@ Tags: design system, componenti condivisi
 Requires at least: 6.0
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,6 +55,14 @@ stato migrato per intero alle classi `.fmls-*` (solo ai token), in
 `docs/architettura-formalife-core.md` nel repository `claude-web`.
 
 == Changelog ==
+
+= 1.1.0 =
+* Nuovi token `--fmls-green-reassure` / `-dark` / `-light` (verde di
+  rassicurazione, da usare con parsimonia nei badge di garanzia/fiducia).
+  Valori migrati 1:1 da `formalife-homepage`, promossi qui perché la
+  landing del corso pratico adotta lo stile core esatto invece di una
+  palette propria — vedi `docs/DECISIONI-TECNICHE.md` nel repository
+  `claude-web`, 2026-09-11.
 
 = 1.0.0 =
 * Prima versione: estratti da guida-antipanico-soffocamento v3.7.5 i token di

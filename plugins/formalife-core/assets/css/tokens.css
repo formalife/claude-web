@@ -9,6 +9,12 @@
  *
  * Valori migrati 1:1 da guida-antipanico-soffocamento v3.7.5 (prima fonte
  * di questi colori/font): nessun valore reinventato in questa estrazione.
+ *
+ * --fmls-green-reassure* (v1.1.0): eccezione all'origine "migrato da
+ * guida-antipanico-soffocamento" — valori migrati 1:1 da formalife-homepage
+ * (badge di garanzia/rassicurazione), promossi qui perché la landing del
+ * corso li adotta come parte del passaggio allo stile core esatto (non più
+ * palette propria) — vedi DECISIONI-TECNICHE.md, 2026-09-11.
  */
 :root {
 	--fmls-cream: #FFFDF7;
@@ -32,4 +38,10 @@
 	--fmls-blue-dark: #14495C;
 	--fmls-orange: #E08A3C;
 	--fmls-yellow-light: #FCE9A8;
+
+	/* Verde di rassicurazione: da usare con parsimonia, solo in badge di
+	   garanzia/fiducia — non un colore di brand primario. */
+	--fmls-green-reassure: #2E7D5B;
+	--fmls-green-reassure-dark: #1F5C41;
+	--fmls-green-reassure-light: #E6F4EC;
 }

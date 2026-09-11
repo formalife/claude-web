@@ -25,12 +25,20 @@
  *    [hidden], .is-visible) non sono mai toccati: questo foglio è puramente
  *    estetico.
  *
- * 5. v4.6.4: i token realmente condivisi con formalife-core (font, raggi,
- *    larghezza massima, ink/white, i tre colori "libro") sono ora alias
- *    var(--fmls-*, <valore originale>) — un solo posto definisce quei
- *    valori, con fallback esplicito se formalife-core non fosse attivo. La
- *    palette propria (blu/rosso/verde/crema e le ombre/bordi calcolati su
- *    di essa) resta scritta qui, deliberatamente indipendente.
+ * 5. v4.6.6: la landing del corso adotta lo **stile core esatto** di
+ *    formalife-core (crema/teal/terracotta, la stessa identità del libro),
+ *    non più una palette propria adattata — decisione esplicita del
+ *    proprietario, vedi DECISIONI-TECNICHE.md (2026-09-11). Ogni token
+ *    sotto è quindi `var(--fmls-*, <stesso valore di formalife-core>)`: il
+ *    fallback non è più "il colore indipendente di prima", ma il valore
+ *    core stesso, ripetuto qui solo per continuare a rendere identico se
+ *    formalife-core non fosse attivo. Le poche variabili senza equivalente
+ *    diretto in formalife-core (`--fmh-red-dark/-light`, `--fmh-shadow-lift`)
+ *    sono derivate a mano dagli stessi valori core (stessa tinta terracotta/
+ *    teal), non inventate. La homepage generale (`frontend.css`,
+ *    `template-home.php`) NON è toccata da questa decisione: mantiene la
+ *    propria palette blu/rosso/verde indipendente, come da readme del
+ *    plugin — qui cambia solo il corso.
  */
 
 /* =====================================================================
@@ -40,24 +48,24 @@
 .fmh-course-modal,
 .fmh-mobile-cta,
 .fmh-course-thankyou {
-	--fmh-cream: #FBF8F4;
-	--fmh-cream-alt: #F4EDE3;
-	--fmh-blue-deep: #1E3A5F;
-	--fmh-blue-darker: #142843;
-	--fmh-blue-light: #EEF3F9;
-	--fmh-red: #C94A4A;
-	--fmh-red-dark: #A33535;
-	--fmh-red-light: #FAEAEA;
-	--fmh-green: #2E7D5B;
-	--fmh-green-dark: #1F5C41;
-	--fmh-green-light: #E6F4EC;
+	--fmh-cream: var(--fmls-cream, #FFFDF7);
+	--fmh-cream-alt: var(--fmls-cream-warm, #F5D9A8);
+	--fmh-blue-deep: var(--fmls-teal-deep, #0B6560);
+	--fmh-blue-darker: var(--fmls-teal-darker, #084F4B);
+	--fmh-blue-light: var(--fmls-yellow-light, #FCE9A8);
+	--fmh-red: var(--fmls-terracotta, #C24E3A);
+	--fmh-red-dark: #A54231; /* terracotta scurita ~15%, stesso metodo di GAPS_Assets::darken_hex() — nessun token core equivalente */
+	--fmh-red-light: #FAE7E3; /* terracotta stemperata verso il bianco — nessun token core equivalente */
+	--fmh-green: var(--fmls-green-reassure, #2E7D5B);
+	--fmh-green-dark: var(--fmls-green-reassure-dark, #1F5C41);
+	--fmh-green-light: var(--fmls-green-reassure-light, #E6F4EC);
 	--fmh-ink: var(--fmls-ink, #1A1A1A);
 	--fmh-ink-soft: var(--fmls-ink-soft, #3A3A3A);
 	--fmh-white: var(--fmls-white, #FFFFFF);
-	--fmh-border-soft: rgba(30,58,95,0.15);
-	--fmh-shadow-soft: 0 4px 20px rgba(30,58,95,0.08);
-	--fmh-shadow-card: 0 8px 30px rgba(30,58,95,0.12);
-	--fmh-shadow-lift: 0 18px 46px rgba(30,58,95,0.18);
+	--fmh-border-soft: var(--fmls-border-soft, rgba(11,101,96,0.15));
+	--fmh-shadow-soft: var(--fmls-shadow-soft, 0 4px 20px rgba(11,101,96,0.08));
+	--fmh-shadow-card: var(--fmls-shadow-card, 0 8px 30px rgba(11,101,96,0.12));
+	--fmh-shadow-lift: 0 18px 46px rgba(11,101,96,0.18); /* stessa tinta di --fmls-shadow-card, ombra più profonda — nessun token core equivalente */
 	--fmh-radius: var(--fmls-radius, 20px);
 	--fmh-radius-sm: var(--fmls-radius-sm, 12px);
 	--fmh-max-w: var(--fmls-max-w, 1120px);
@@ -121,7 +129,7 @@
 .fmh-course-page .fmh-eyebrow-center { display: table; margin-left: auto; margin-right: auto; }
 
 body.fmh-course-body,
-body.fmh-course-thankyou-body { margin: 0; background: #FBF8F4; }
+body.fmh-course-thankyou-body { margin: 0; background: var(--fmls-cream, #FFFDF7); }
 body.fmh-modal-open { overflow: hidden; }
 
 .fmh-course-page {

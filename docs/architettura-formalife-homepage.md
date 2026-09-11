@@ -3,7 +3,7 @@ title: "Architettura — plugin formalife-homepage"
 progetto: "Formalife, Sviluppo Web & Plugin"
 tipo: "riferimento tecnico"
 status: "vivo (aggiornare ad ogni modifica strutturale)"
-versione_plugin_al: "4.6.5"
+versione_plugin_al: "4.6.6"
 ultimo_aggiornamento: "2026-09-11"
 ---
 
@@ -68,7 +68,11 @@ Lo slug `genitori-pronti` è legacy: pre-esisteva a questo plugin, adottato
 | `templates/template-home.php`, `template-course.php`, `template-course-thankyou.php` | Markup delle 3 pagine. Copy lungo delle sezioni vive nel template (non in impostazioni) dalla v2.0.0. |
 | `assets/js/course.js`, `assets/js/frontend.js`, `assets/js/fmh-stripe-loader.js` | Step del checkout corso, form lista d'attesa, caricamento lazy di Stripe.js (solo al primo click su un CTA, come nel plugin del libro). |
 
-## 4. Integrazione con formalife-core (dalla v4.6.4)
+## 4. Integrazione con formalife-core — homepage generale (dalla v4.6.4)
+
+**Vale solo per `assets/css/frontend.css` / `template-home.php` (pagina
+`home`).** Per la landing e la conferma del corso, superata dalla migrazione
+completa descritta in §4bis.
 
 Secondo plugin migrato dopo `guida-antipanico-soffocamento` (v3.7.6). A
 differenza del libro — i cui token colore coincidono 1:1 con quelli di
@@ -100,6 +104,58 @@ formalife-core è stato aliasato:
   di stile mancante. Verificato per lettura, non per test dal vivo (nessun
   accesso al sito in questa sessione) — la prima cosa da controllare dopo il
   deploy è che homepage e landing corso rendano identiche a prima.
+
+## 4bis. Stile core esatto sul corso (dalla v4.6.6)
+
+**Vale per `assets/css/course.css` (landing `genitori-pronti` **e** conferma
+`corso-confermato`, che condividono lo stesso file/selettori
+`.fmh-course-page, .fmh-course-modal, .fmh-mobile-cta, .fmh-course-thankyou`)
+e per il modale di checkout.** Decisione esplicita del proprietario
+(2026-09-11, vedi `DECISIONI-TECNICHE.md`): il corso non ha più una palette
+propria "adattata" da quella del libro — eredita **esattamente** i colori di
+formalife-core, gli stessi del libro.
+
+Mappatura (ogni riga è ora `var(--fmls-x, <stesso valore di formalife-core>)`
+— il fallback non è più "il vecchio colore indipendente", ma il valore core
+stesso, ripetuto solo per continuare a rendere identico se formalife-core
+non fosse attivo):
+
+| Token corso | Prima (v4.6.4, palette propria) | Ora → token formalife-core |
+|---|---|---|
+| `--fmh-cream` | `#FBF8F4` | `--fmls-cream` (`#FFFDF7`) |
+| `--fmh-cream-alt` | `#F4EDE3` | `--fmls-cream-warm` (`#F5D9A8`) |
+| `--fmh-blue-deep` / `-darker` | `#1E3A5F` / `#142843` | `--fmls-teal-deep` / `--fmls-teal-darker` |
+| `--fmh-blue-light` | `#EEF3F9` | `--fmls-yellow-light` (`#FCE9A8`) |
+| `--fmh-red` (CTA) | `#C94A4A` | `--fmls-terracotta` (`#C24E3A`) — **il pulsante di acquisto è terracotta, non più rosso** |
+| `--fmh-green` / `-dark` / `-light` (badge garanzia) | `#2E7D5B` / `#1F5C41` / `#E6F4EC` | `--fmls-green-reassure` / `-dark` / `-light` (**nuovo in formalife-core v1.1.0**, stessi valori — vedi sotto) |
+| `--fmh-border-soft`, `--fmh-shadow-soft`, `--fmh-shadow-card` | tinta blu propria | equivalenti `--fmls-*` (tinta teal) |
+
+**Senza equivalente diretto in formalife-core** (derivati a mano dagli stessi
+valori core, non inventati — nessun `var()` possibile perché il token non
+esiste lì):
+- `--fmh-red-dark: #A54231` — terracotta scurita ~15%, stesso metodo di
+  `GAPS_Assets::darken_hex()`.
+- `--fmh-red-light: #FAE7E3` — terracotta stemperata verso il bianco.
+- `--fmh-shadow-lift: 0 18px 46px rgba(11,101,96,0.18)` — stessa tinta di
+  `--fmls-shadow-card`, ombra più profonda (formalife-core non ha una
+  variante "lift").
+
+**Nuovo token in formalife-core (v1.1.0):** `--fmls-green-reassure` /
+`-dark` / `-light`, migrato 1:1 dal valore che questo plugin già usava per i
+badge di garanzia — promosso a token condiviso invece di restare
+un'eccezione locale, così un futuro terzo plugin che avesse bisogno dello
+stesso accento non deve reinventarlo. Vedi `docs/architettura-formalife-core.md`.
+
+**Cosa NON è cambiato:** homepage generale (`home`, §4), contenuti testuali,
+checkout/prezzi/PaymentIntent/webhook/email/capienza, template PHP (nessun
+colore era hardcoded lì — verificato, tutti i colori passano dalle custom
+property CSS).
+
+**Non ancora fatto:** nessuna verifica visiva dal vivo (nessun accesso al
+sito in questa sessione) — la prima cosa da controllare dopo il deploy è che
+la landing corso e la pagina di conferma rendano nella nuova palette
+teal/terracotta senza regressioni di contrasto/leggibilità (in particolare
+il testo bianco sul pulsante CTA ora terracotta anziché rosso).
 
 ## 5. Sistema impostazioni
 
@@ -151,6 +207,10 @@ non cancellerà più nulla. Spuntala solo quando l'intento è davvero smontare
 il plugin e ripulire il sito.
 
 ## 7. Changelog (sintesi — dettaglio completo in `readme.txt` del plugin)
+- **4.6.6** — Landing e conferma del corso passano allo **stile core esatto**
+  di formalife-core (crema/teal/terracotta) al posto della palette propria —
+  vedi §4bis. Pulsante di acquisto ora terracotta (era rosso). Homepage
+  generale non toccata.
 - **4.6.5** — Sicurezza: `uninstall.php` non cancella più automaticamente
   impostazioni (chiavi Stripe comprese), ordini corso e pagine generate al
   primo "Elimina" da bacheca. Serve prima spuntare "Cancella i dati alla

@@ -3,8 +3,8 @@ title: "Architettura — plugin formalife-core"
 progetto: "Formalife, Sviluppo Web & Plugin"
 tipo: "riferimento tecnico"
 status: "vivo (aggiornare ad ogni modifica strutturale)"
-versione_plugin_al: "1.0.0"
-ultimo_aggiornamento: "2026-09-10"
+versione_plugin_al: "1.1.0"
+ultimo_aggiornamento: "2026-09-11"
 ---
 
 # Architettura — plugin `formalife-core`
@@ -18,7 +18,7 @@ popup ogni volta. Vedi la decisione che lo ha originato in `DECISIONI-TECNICHE.m
 ## 1. Cosa fornisce
 | File | Cosa contiene |
 |---|---|
-| `assets/css/tokens.css` | Custom property `--fmls-*`: colori, font, spaziature, ombre, raggio angoli. Solo variabili — inerti finché non richiamate con `var()`, quindi sicure su `:root` globale (non "leakano" stili come farebbero classi non scoped). |
+| `assets/css/tokens.css` | Custom property `--fmls-*`: colori, font, spaziature, ombre, raggio angoli. Solo variabili — inerti finché non richiamate con `var()`, quindi sicure su `:root` globale (non "leakano" stili come farebbero classi non scoped). Dalla v1.1.0 include anche `--fmls-green-reassure`/`-dark`/`-light` (verde di rassicurazione per badge di garanzia, da usare con parsimonia — non un colore di brand primario). |
 | `assets/css/components.css` | Classi `.fmls-*`: pulsanti (`fmls-btn-primary`, `-onlight`, `-secondary`, `-lg`), contenitore pagina (`fmls-wrap`), guscio popup (`fmls-modal-overlay`, `fmls-modal`, `fmls-modal-close`), form (`fmls-form-row`, `fmls-form-message`), etichetta discreta (`fmls-micro`), comparsa (`fmls-reveal`). |
 | `assets/css/fonts.css` + `assets/fonts/` | `@font-face` locali (Fredoka, Karla, Lora) — nessuna richiesta a Google Fonts. File WOFF2 non versionati (licenza): vedi `assets/fonts/README.txt`. |
 | `includes/formalife-core-functions.php` | `formalife_core_enqueue()` (registra ed enqueua token+font+componenti, ritorna gli handle), `formalife_core_output_font_preloads( $font_files )` (preload solo se il file esiste su disco). |
@@ -61,6 +61,24 @@ trattandosi di un plugin live che incassa pagamenti reali:
   — la prima cosa da controllare dopo il deploy è che la landing renda
   identica a prima.
 
+## 3bis. Integrazione con formalife-homepage — due livelli diversi
+
+`formalife-homepage` dipende da formalife-core in due modi diversi, non
+confonderli (dettaglio completo in `docs/architettura-formalife-homepage.md`):
+
+- **Homepage generale** (`frontend.css`, dalla v4.6.4): come
+  guida-antipanico-soffocamento §3 — solo il sottoinsieme di token
+  realmente identico (font, raggi, ink/white) è aliasato con fallback; la
+  palette propria (blu/rosso/verde) resta scritta lì, deliberatamente
+  indipendente.
+- **Landing e conferma del corso** (`course.css`, dalla v4.6.6): **stile
+  core esatto**, non un'adattamento — ogni colore (crema, teal, terracotta,
+  verde di rassicurazione) eredita direttamente il valore di formalife-core,
+  fallback incluso. Primo caso in cui un plugin di prodotto adotta l'intera
+  identità cromatica del libro invece di una palette propria. Ha anche
+  originato il nuovo token `--fmls-green-reassure*` (v1.1.0, vedi §1):
+  valore migrato da formalife-homepage, non inventato qui.
+
 ## 4. Distribuzione
 Non ha (ancora) un repository di distribuzione dedicato in stile Plugin
 Update Checker: a differenza di `guida-antipanico-soffocamento`, per ora
@@ -73,5 +91,6 @@ usano, vale la pena riconsiderare.
 ## 5. Decisioni aperte
 - Se/quando migrare le classi di `guida-antipanico-soffocamento` da `gaps-*`
   a `fmls-*` per intero (vedi §3).
-- Se dare a formalife-core un proprio repository di distribuzione quando un
-  secondo plugin di prodotto (es. il corso) inizia a dipenderne davvero.
+- Se dare a formalife-core un proprio repository di distribuzione ora che un
+  secondo plugin di prodotto (`formalife-homepage`, sulla landing del corso)
+  ne dipende in modo pieno, non più solo per pochi token (vedi §3bis).
