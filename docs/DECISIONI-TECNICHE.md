@@ -67,6 +67,62 @@ non si rispiega da zero ogni volta e non si ripetono errori già risolti.
   non richiesta dentro una sessione dedicata a un incidente di sicurezza su
   un plugin di pagamenti live. Resta un passo esplicito separato.
 
+### 2026-09-11 · Ripristinata la palette del corso + audit di coerenza token su tutti i plugin
+- **Contesto:** dopo la voce precedente (stesso giorno), il proprietario ha
+  preferito visivamente la palette propria di prima sulla landing del corso,
+  e ha chiesto un audit di coerenza dei token su **tutte le pagine di tutti
+  i plugin**, con libertà di introdurre eccezioni motivate ma privilegiando
+  l'uniformità.
+- **Decisione 1 — ripristino:** `course.css` torna alla palette propria
+  blu/rosso/verde (pulsante di acquisto di nuovo rosso), stesso criterio di
+  `frontend.css` (solo font/raggi/ink/white/colori "libro" aliasati a
+  formalife-core). Il token `--fmls-green-reassure*` aggiunto in
+  formalife-core per il tentativo precedente resta definito ma senza
+  consumatori — non rimosso, disponibile per un futuro riuso.
+- **Decisione 2 — audit, cosa è stato trovato e corretto:**
+  - **`formalife-homepage`**: `frontend.css` e `course.css` dichiaravano lo
+    stesso ruolo (`--fmh-font-display`/`--fmh-font-body`) con fallback
+    diversi (`system-ui` vs `'Arial Rounded MT Bold', Arial`) — derivante
+    dal fatto che sono due dichiarazioni separate (course.css non eredita i
+    token di frontend.css, vedi nota architetturale in quel file) che nel
+    tempo erano divergenti. Uniformato al fallback di formalife-core in
+    entrambi i file.
+  - **`guida-antipanico-soffocamento`**: la dipendenza da formalife-core,
+    costruita in v3.7.6 (2026-09-10) ma mai applicata al sorgente
+    coordinato (rimasta alla v3.7.5, vedi voce "Repository ricreato da
+    zero..." più sotto e le voci precedenti del 2026-09-11), era la
+    **principale incoerenza tra plugin**: `formalife-homepage` già
+    dipendeva parzialmente da formalife-core, questo plugin da nessun
+    token. Applicata ora (v3.7.8): font e token colore/spaziatura aliasati,
+    con lo stesso criterio già verificato più volte in questa sessione
+    (fallback espliciti, nessuna classe CSS rinominata). `legal.css` aveva
+    anche un giallo scritto a mano (`#FCE9A8`) identico a
+    `--gaps-yellow-light`: ora referenzia il token.
+  - **Non trovate altre incoerenze strutturali**: `legal.css`, `numeri.css`,
+    `thankyou.css` di guida-antipanico-soffocamento condividono già
+    correttamente i token di `frontend.css` tramite la classe wrapper
+    `.gaps-landing`, presente in ogni template — un solo punto di
+    definizione per tutte e 5 le pagine. I file `admin.css` di entrambi i
+    plugin usano deliberatamente i colori standard di wp-admin, non i
+    token Formalife — corretto, l'interfaccia di bacheca deve restare
+    coerente con WordPress, non col brand pubblico.
+- **Tipo:** funzionalità (design/UI) + bugfix minore (coerenza).
+- **Toccati:** `plugins/formalife-homepage/assets/css/course.css` (revert),
+  `assets/css/frontend.css` (fallback font), `formalife-homepage.php`,
+  `readme.txt` (v4.6.6 → **v4.6.7**).
+  `plugins/guida-antipanico-soffocamento/guida-antipanico-soffocamento.php`,
+  `includes/class-gaps-assets.php`, `assets/css/frontend.css`,
+  `assets/css/legal.css`, `readme.txt` (v3.7.7 → **v3.7.8**, applica
+  finalmente la 3.7.6). Rimossi `assets/css/fonts.css` e `assets/fonts/` da
+  guida-antipanico-soffocamento (font ora solo in formalife-core, stesso
+  pattern già usato da formalife-homepage).
+- **Non ancora fatto:** nessuna verifica visiva dal vivo su entrambi i
+  plugin (nessun accesso al sito in questa sessione) — la prima cosa da
+  controllare dopo il deploy è che ogni pagina di entrambi i plugin renda
+  identica a prima (nessun cambiamento visivo previsto per
+  guida-antipanico-soffocamento; corso di formalife-homepage di nuovo come
+  prima della v4.6.6).
+
 ### 2026-09-11 · Landing del corso: stile core esatto invece di palette propria
 - **Decisione:** la landing e la pagina di conferma del corso pratico
   (`genitori-pronti`, `corso-confermato` — file `course.css`) non usano più

@@ -207,7 +207,7 @@ table.gaps-legal-table tr:last-child td { border-bottom: none; }
 
 /* Segnaposto dati legali non ancora compilati */
 mark.gaps-legal-todo {
-	background: #FCE9A8;
+	background: var(--gaps-yellow-light, #FCE9A8);
 	color: var(--gaps-ink);
 	padding: 1px 6px;
 	border-radius: 4px;

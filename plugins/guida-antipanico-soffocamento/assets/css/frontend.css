@@ -3,30 +3,40 @@
  * Tutte le classi sono prefissate "gaps-" e ogni regola è annidata sotto
  * ".gaps-landing" (o ".gaps-topbar", fuori scala) per evitare conflitti
  * con il tema attivo o altri plugin.
+ *
+ * v3.7.6: i valori qui sotto sono alias verso i token condivisi di
+ * formalife-core (--fmls-*), non più valori scritti a mano — un solo
+ * posto (formalife-core) definisce i colori/font di base di Formalife.
+ * Ogni var() ha comunque il valore originale come secondo argomento di
+ * fallback: se formalife-core non fosse attivo per qualsiasi motivo, il
+ * plugin continua a rendere esattamente come prima, senza dipendenze
+ * fragili. Le impostazioni colore dell'admin (vedi
+ * GAPS_Assets::build_dynamic_css()) continuano a sovrascrivere questi
+ * valori esattamente come facevano prima: nessun cambiamento lì.
  */
 
 .gaps-topbar, .gaps-landing {
-	--gaps-cream: #FFFDF7;
-	--gaps-cream-warm: #F5D9A8;
-	--gaps-teal-deep: #0B6560;
-	--gaps-teal-bright: #2CADA9;
-	--gaps-teal-darker: #084F4B;
-	--gaps-ink: #1A1A1A;
-	--gaps-ink-soft: #3A3A3A;
-	--gaps-terracotta: #C24E3A;
-	--gaps-white: #FFFFFF;
-	--gaps-border-soft: rgba(11,101,96,0.15);
-	--gaps-shadow-soft: 0 4px 20px rgba(11,101,96,0.08);
-	--gaps-shadow-card: 0 8px 30px rgba(11,101,96,0.12);
-	--gaps-radius: 20px;
-	--gaps-radius-sm: 12px;
-	--gaps-max-w: 1120px;
-	--gaps-font-display: 'Fredoka', 'Arial Rounded MT Bold', Arial, sans-serif;
-	--gaps-font-body: 'Karla', Arial, sans-serif;
-	--gaps-font-story: 'Lora', Georgia, serif;
-	--gaps-blue-dark: #14495C;
-	--gaps-orange: #E08A3C;
-	--gaps-yellow-light: #FCE9A8;
+	--gaps-cream: var(--fmls-cream, #FFFDF7);
+	--gaps-cream-warm: var(--fmls-cream-warm, #F5D9A8);
+	--gaps-teal-deep: var(--fmls-teal-deep, #0B6560);
+	--gaps-teal-bright: var(--fmls-teal-bright, #2CADA9);
+	--gaps-teal-darker: var(--fmls-teal-darker, #084F4B);
+	--gaps-ink: var(--fmls-ink, #1A1A1A);
+	--gaps-ink-soft: var(--fmls-ink-soft, #3A3A3A);
+	--gaps-terracotta: var(--fmls-terracotta, #C24E3A);
+	--gaps-white: var(--fmls-white, #FFFFFF);
+	--gaps-border-soft: var(--fmls-border-soft, rgba(11,101,96,0.15));
+	--gaps-shadow-soft: var(--fmls-shadow-soft, 0 4px 20px rgba(11,101,96,0.08));
+	--gaps-shadow-card: var(--fmls-shadow-card, 0 8px 30px rgba(11,101,96,0.12));
+	--gaps-radius: var(--fmls-radius, 20px);
+	--gaps-radius-sm: var(--fmls-radius-sm, 12px);
+	--gaps-max-w: var(--fmls-max-w, 1120px);
+	--gaps-font-display: var(--fmls-font-display, 'Fredoka', 'Arial Rounded MT Bold', Arial, sans-serif);
+	--gaps-font-body: var(--fmls-font-body, 'Karla', Arial, sans-serif);
+	--gaps-font-story: var(--fmls-font-story, 'Lora', Georgia, serif);
+	--gaps-blue-dark: var(--fmls-blue-dark, #14495C);
+	--gaps-orange: var(--fmls-orange, #E08A3C);
+	--gaps-yellow-light: var(--fmls-yellow-light, #FCE9A8);
 }
 
 .gaps-landing {

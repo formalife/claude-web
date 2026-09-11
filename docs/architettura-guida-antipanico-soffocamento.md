@@ -3,7 +3,7 @@ title: "Architettura — plugin guida-antipanico-soffocamento"
 progetto: "Formalife, Sviluppo Web & Plugin"
 tipo: "riferimento tecnico"
 status: "vivo (aggiornare ad ogni modifica strutturale)"
-versione_plugin_al: "3.7.7"
+versione_plugin_al: "3.7.8"
 ultimo_aggiornamento: "2026-09-11"
 ---
 
@@ -14,17 +14,17 @@ libro "La Guida Anti-Panico al Soffocamento Pediatrico". Obiettivo: chi riprende
 lavoro (umano o Claude) capisce in due minuti dove intervenire, senza rileggere tutto
 il codice da capo.
 
-**Dipendenza da formalife-core: costruita ma NON ancora applicata al sorgente
-coordinato.** Esiste uno zip `guida-antipanico-soffocamento_v3_7_6.zip` in
-questa stessa cartella che integra formalife-core (token colore/font/spaziatura
-e `@font-face` da lì, header `Requires Plugins`) — vedi
-`docs/architettura-formalife-core.md` §3 per il dettaglio di cosa migrerebbe e
-cosa no. Il sorgente coordinato in `plugins/guida-antipanico-soffocamento/`
-**non la include**: la v3.7.7 (sicurezza uninstall, vedi sotto) parte
-direttamente dalla 3.7.5, per non introdurre in questa sessione — dedicata a
-un incidente di sicurezza su un plugin di pagamenti live — una modifica
-visiva/di dipendenza non richiesta. Applicare quello zip al sorgente resta un
-passo esplicito, separato, da fare quando richiesto — vedi §8.
+**Dipendenza (dalla v3.7.8):** questo plugin richiede `formalife-core` attivo
+(header `Requires Plugins`). Token di colore/font/spaziatura e le
+dichiarazioni `@font-face` vengono da lì — vedi
+`docs/architettura-formalife-core.md` §3 per il dettaglio di cosa è migrato
+e cosa no. La dipendenza era stata costruita in uno zip già alla v3.7.6
+(2026-09-10) ma non applicata al sorgente coordinato fino a questa
+versione, nell'ambito di un audit esplicito di coerenza dei token richiesto
+dal proprietario su tutti i plugin — vedi `DECISIONI-TECNICHE.md`
+(2026-09-11). La 3.7.7 (sicurezza uninstall) era partita apposta dalla 3.7.5
+per non introdurre questa modifica in una sessione dedicata a un incidente
+di sicurezza; applicata ora in 3.7.8.
 
 **Se stai per modificare qualcosa che non trovi descritto qui, il documento è
 disallineato dal codice reale allegato in conversazione: fidati del codice, poi
@@ -56,7 +56,7 @@ Gestione URL/slug centralizzata in `class-gaps-page-manager.php` (`GAPS_Page_Man
 | `includes/gaps-settings-helpers.php` | `gaps_default_settings()`, `gaps_get_settings()` (merge salvato+default), helper di conversione prezzo→centesimi (`gaps_get_price_cents()`, `gaps_get_shipping_cents()`), `gaps_has_cta_destination()`. **Unica fonte di verità per ogni importo.** |
 | `includes/class-gaps-preorder.php` | CPT `gaps_preorder` ("Preordini ricevuti" — la bacheca/dashboard degli ordini), gestione submit del form (AJAX `gaps_submit_preorder`), creazione del PaymentIntent Stripe, colonne/filtri della lista admin, meta box dettaglio ordine. |
 | `includes/class-gaps-stripe-webhook.php` | Endpoint REST pubblico che riceve gli eventi Stripe, verifica la firma (`Stripe-Signature`, tolleranza 300s), aggiorna lo stato pagamento, invia le email (cliente + notifica interna). |
-| `includes/class-gaps-assets.php` | Enqueue CSS/JS, localizzazione dell'oggetto JS `gapsFrontend` (prezzi in centesimi, URL, nonce). |
+| `includes/class-gaps-assets.php` | Enqueue CSS/JS, localizzazione dell'oggetto JS `gapsFrontend` (prezzi in centesimi, URL, nonce). Dalla v3.7.8 delega font/token a `formalife_core_enqueue()` (guardia `function_exists()`) invece di caricare `assets/css/fonts.css` in proprio. |
 | `includes/class-gaps-admin-notices.php` | Avvisi globali in bacheca (non solo nella pagina impostazioni): chiavi Stripe mancanti, **webhook secret mancante** (il check più importante, vedi §6). |
 | `includes/gaps-legal-content.php` | Contenuto di Condizioni di vendita e Privacy Policy, generato dalle impostazioni (prezzo, spedizione, garanzia...). |
 | `templates/template-landing.php` | Markup della landing + popup di acquisto (step 1-2-3). |
@@ -118,12 +118,19 @@ questo `uninstall.php` non cancella CPT di ordini (`gaps_preorder` non è
 tra le cose rimosse) — solo impostazioni e pagine.
 
 ## 7. Changelog (sintesi — dettaglio completo in `readme.txt` del plugin)
+- **3.7.8** — Applicata al sorgente coordinato la dipendenza `formalife-core`
+  costruita in 3.7.6 (token colore/font/spaziatura e font @font-face
+  migrati lì, con fallback espliciti — zero cambiamento visivo previsto;
+  classi CSS proprie `gaps-*` non toccate, vedi
+  `docs/architettura-formalife-core.md` §3). Audit di coerenza token: il
+  giallo hardcoded di `mark.gaps-legal-todo` in `legal.css` ora referenzia
+  `--gaps-yellow-light` invece di un valore scritto a mano identico.
 - **3.7.7** — Sicurezza: `uninstall.php` richiede consenso esplicito
   (`allow_uninstall_wipe`, falso di default) prima di cancellare
-  impostazioni/pagine — vedi §6bis. Parte direttamente dalla 3.7.5 (la 3.7.6,
-  dipendenza formalife-core, resta pendente/non applicata — vedi sopra e §8).
-- **3.7.6** — Costruita come zip, non ancora applicata al sorgente
-  coordinato (vedi sopra). Nuova dipendenza `formalife-core`: token colore/font/spaziatura
+  impostazioni/pagine — vedi §6bis. Partita direttamente dalla 3.7.5 (la
+  dipendenza formalife-core, già costruita in 3.7.6, applicata poi in 3.7.8).
+- **3.7.6** — Costruita come zip, non applicata al sorgente coordinato fino
+  alla 3.7.8 (vedi sopra). Nuova dipendenza `formalife-core`: token colore/font/spaziatura
   e font @font-face migrati lì (con fallback espliciti, zero cambiamento
   visivo previsto). Classi CSS proprie (`gaps-*`) non toccate — vedi
   `docs/architettura-formalife-core.md` §3.
@@ -148,11 +155,10 @@ tra le cose rimosse) — solo impostazioni e pagine.
   momento: **flat**, assunzione non ancora confermata esplicitamente.
 - Nome/contenuto degli altri plugin Formalife da registrare in `claude-web` — da
   aggiungere non appena disponibili (codice e/o descrizione).
-- **Applicare la dipendenza da formalife-core (v3.7.6) al sorgente coordinato**:
-  costruita, verificata, mai applicata (vedi intestazione del documento).
-  Richiede una conferma esplicita prima di procedere, trattandosi di un
-  plugin di pagamenti live — poi versionare come 3.7.8 (3.7.7 è già presa
-  dalla sicurezza uninstall).
+- Se/quando migrare le classi CSS proprie (`gaps-*`) a `fmls-*` per intero
+  (vedi `docs/architettura-formalife-core.md` §3) — non fatto nell'audit di
+  coerenza del 2026-09-11: avrebbe richiesto toccare ogni template HTML
+  senza modo di testarlo dal vivo in questa sessione.
 
 ## 9. Distribuzione e aggiornamenti
 Il plugin include **Plugin Update Checker** (libreria di YahnisElsts, vendorizzata

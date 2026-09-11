@@ -4,7 +4,7 @@ Tags: landing page, ecommerce, stripe, pediatria
 Requires at least: 6.0
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 3.7.7
+Stable tag: 3.7.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,9 +47,14 @@ Se le chiavi Stripe non sono ancora configurate, il popup funziona comunque (il 
 
 == Changelog ==
 
+= 3.7.8 =
+* Nuova dipendenza: formalife-core (plugin condiviso di stile/token/componenti tra i plugin Formalife — va attivato insieme a questo). Colori, font e spaziature di base ora vengono da lì; questo plugin continua a usare le proprie classi "gaps-*" invariate, con fallback espliciti se formalife-core non fosse attivo. Font locali (Fredoka/Karla/Lora) spostati in formalife-core: rimossi da questo plugin assets/css/fonts.css e assets/fonts/.
+* Applica finalmente al sorgente coordinato la dipendenza formalife-core già preparata (e mai applicata) nella 3.7.6 — vedi la nota sotto.
+* Audit di coerenza dei token: `mark.gaps-legal-todo` in legal.css usava un giallo scritto a mano, identico a `--gaps-yellow-light` — ora referenzia il token condiviso.
+
 = 3.7.7 =
 * Sicurezza: disinstallare il plugin (Bacheca → Plugin → Elimina) non cancella più automaticamente impostazioni (comprese le chiavi Stripe) e pagine generate. Serve prima spuntare "Cancella i dati alla disinstallazione" in impostazioni (falsa di default). Prima di questa versione, eliminare il plugin per sostituirlo con uno zip più recente cancellava questi dati senza preavviso.
-* Nota: questa versione parte direttamente dalla 3.7.5. La 3.7.6 (dipendenza da formalife-core, costruita ma non ancora applicata al sorgente coordinato) resta una modifica separata e pendente — vedi docs/DECISIONI-TECNICHE.md.
+* Nota: questa versione partiva direttamente dalla 3.7.5, saltando la 3.7.6 (dipendenza da formalife-core, costruita ma non ancora applicata al sorgente coordinato) — applicata poi in 3.7.8.
 
 = 3.7.5 =
 * Corretto il modello di repository: `github.com/formalife/claude-web` (introdotto in 3.7.4) resta il workspace di coordinamento per tutti i plugin Formalife, ma la sorgente degli aggiornamenti automatici di questo plugin punta ora a un repository dedicato, `github.com/formalife/plugin-guida-al-soffocamento`, sincronizzato da `claude-web` ad ogni rilascio. Necessario perché Plugin Update Checker legge il changelog solo dalla radice del repository, e più plugin coordinati nello stesso repo di sviluppo ne avrebbero uno solo alla radice.

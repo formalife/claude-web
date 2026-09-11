@@ -18,7 +18,7 @@ popup ogni volta. Vedi la decisione che lo ha originato in `DECISIONI-TECNICHE.m
 ## 1. Cosa fornisce
 | File | Cosa contiene |
 |---|---|
-| `assets/css/tokens.css` | Custom property `--fmls-*`: colori, font, spaziature, ombre, raggio angoli. Solo variabili — inerti finché non richiamate con `var()`, quindi sicure su `:root` globale (non "leakano" stili come farebbero classi non scoped). Dalla v1.1.0 include anche `--fmls-green-reassure`/`-dark`/`-light` (verde di rassicurazione per badge di garanzia, da usare con parsimonia — non un colore di brand primario). |
+| `assets/css/tokens.css` | Custom property `--fmls-*`: colori, font, spaziature, ombre, raggio angoli. Solo variabili — inerti finché non richiamate con `var()`, quindi sicure su `:root` globale (non "leakano" stili come farebbero classi non scoped). Dalla v1.1.0 include anche `--fmls-green-reassure`/`-dark`/`-light` (verde di rassicurazione per badge di garanzia) — **attualmente senza consumatori**: aggiunto per un tentativo di stile poi ripristinato su `formalife-homepage` (vedi §3bis), lasciato disponibile per un futuro riuso invece di rimuoverlo. |
 | `assets/css/components.css` | Classi `.fmls-*`: pulsanti (`fmls-btn-primary`, `-onlight`, `-secondary`, `-lg`), contenitore pagina (`fmls-wrap`), guscio popup (`fmls-modal-overlay`, `fmls-modal`, `fmls-modal-close`), form (`fmls-form-row`, `fmls-form-message`), etichetta discreta (`fmls-micro`), comparsa (`fmls-reveal`). |
 | `assets/css/fonts.css` + `assets/fonts/` | `@font-face` locali (Fredoka, Karla, Lora) — nessuna richiesta a Google Fonts. File WOFF2 non versionati (licenza): vedi `assets/fonts/README.txt`. |
 | `includes/formalife-core-functions.php` | `formalife_core_enqueue()` (registra ed enqueua token+font+componenti, ritorna gli handle), `formalife_core_output_font_preloads( $font_files )` (preload solo se il file esiste su disco). |
@@ -36,9 +36,11 @@ popup ogni volta. Vedi la decisione che lo ha originato in `DECISIONI-TECNICHE.m
    fallback esplicito** (secondo argomento di `var()`), così il plugin
    continua a rendere correttamente anche se formalife-core non fosse attivo.
 
-## 3. Integrazione con guida-antipanico-soffocamento (dalla v3.7.6)
-Primo (e finora unico) plugin migrato. Scelta deliberatamente conservativa,
-trattandosi di un plugin live che incassa pagamenti reali:
+## 3. Integrazione con guida-antipanico-soffocamento (dalla v3.7.8)
+Primo plugin migrato (costruito in v3.7.6, applicato al sorgente coordinato
+in v3.7.8 — vedi `DECISIONI-TECNICHE.md`, 2026-09-10 e 2026-09-11). Scelta
+deliberatamente conservativa, trattandosi di un plugin live che incassa
+pagamenti reali:
 
 - **Migrati per intero**: font (`fonts.css` + `assets/fonts/` rimossi dal
   plugin del libro, ora vivono solo in formalife-core) e i valori dei token
@@ -61,23 +63,24 @@ trattandosi di un plugin live che incassa pagamenti reali:
   — la prima cosa da controllare dopo il deploy è che la landing renda
   identica a prima.
 
-## 3bis. Integrazione con formalife-homepage — due livelli diversi
+## 3bis. Integrazione con formalife-homepage (dalla v4.6.4, uniformata in v4.6.7)
 
-`formalife-homepage` dipende da formalife-core in due modi diversi, non
-confonderli (dettaglio completo in `docs/architettura-formalife-homepage.md`):
+Stesso criterio ovunque nel plugin — homepage generale (`frontend.css`) e
+landing/conferma del corso (`course.css`), due dichiarazioni separate per
+motivi strutturali (§4 di `docs/architettura-formalife-homepage.md`) ma
+tenute deliberatamente identiche: solo il sottoinsieme di token realmente
+identico a formalife-core (font, raggi, larghezza massima, ink/white, i tre
+colori "libro" della sola sezione dedicata) è aliasato con fallback; la
+palette propria (blu/rosso/verde/crema) resta scritta lì, deliberatamente
+indipendente — come guida-antipanico-soffocamento §3, ma con una palette
+propria invece che coincidente con quella del libro.
 
-- **Homepage generale** (`frontend.css`, dalla v4.6.4): come
-  guida-antipanico-soffocamento §3 — solo il sottoinsieme di token
-  realmente identico (font, raggi, ink/white) è aliasato con fallback; la
-  palette propria (blu/rosso/verde) resta scritta lì, deliberatamente
-  indipendente.
-- **Landing e conferma del corso** (`course.css`, dalla v4.6.6): **stile
-  core esatto**, non un'adattamento — ogni colore (crema, teal, terracotta,
-  verde di rassicurazione) eredita direttamente il valore di formalife-core,
-  fallback incluso. Primo caso in cui un plugin di prodotto adotta l'intera
-  identità cromatica del libro invece di una palette propria. Ha anche
-  originato il nuovo token `--fmls-green-reassure*` (v1.1.0, vedi §1):
-  valore migrato da formalife-homepage, non inventato qui.
+**Nota storica:** per una versione (v4.6.6, 2026-09-11) `course.css` era
+passato allo "stile core esatto" (colori del libro al posto della palette
+propria, incluso il nuovo token `--fmls-green-reassure*` per il verde di
+rassicurazione — vedi §1). Ripristinata la palette propria in v4.6.7 su
+richiesta esplicita del proprietario (preferenza visiva) — dettaglio in
+`DECISIONI-TECNICHE.md`.
 
 ## 4. Distribuzione
 Non ha (ancora) un repository di distribuzione dedicato in stile Plugin
@@ -91,6 +94,10 @@ usano, vale la pena riconsiderare.
 ## 5. Decisioni aperte
 - Se/quando migrare le classi di `guida-antipanico-soffocamento` da `gaps-*`
   a `fmls-*` per intero (vedi §3).
-- Se dare a formalife-core un proprio repository di distribuzione ora che un
-  secondo plugin di prodotto (`formalife-homepage`, sulla landing del corso)
-  ne dipende in modo pieno, non più solo per pochi token (vedi §3bis).
+- Se dare a formalife-core un proprio repository di distribuzione quando
+  cambierà abbastanza spesso da giustificarlo — per ora entrambi i plugin di
+  prodotto lo consumano solo per un sottoinsieme di token (font/raggi/ink),
+  non c'è più un caso "dipendenza piena" dopo il ripristino della palette
+  propria del corso in v4.6.7 (vedi §3bis).
+- Se/quando trovare un consumatore per `--fmls-green-reassure*` (vedi §1) o
+  rimuoverlo come token inutilizzato.

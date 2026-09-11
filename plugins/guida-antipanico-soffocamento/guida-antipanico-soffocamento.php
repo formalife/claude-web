@@ -3,13 +3,14 @@
  * Plugin Name:       Guida Anti-Panico al Soffocamento Pediatrico — Vendita libro
  * Plugin URI:         https://formalife.it
  * Description:        Landing page di vendita per "La Guida Anti-Panico al Soffocamento Pediatrico" (Formalife), con pagine "Condizioni di vendita", "Privacy", "Grazie — Ordine confermato" e "I tuoi numeri importanti" (scheda in omaggio, raggiungibile dal QR code stampato nel libro) generate automaticamente nello stesso stile. Popup d'acquisto con fatturazione facoltativa e pagamento Stripe integrato (Payment Element); nessuna email alla compilazione del modulo, email di ringraziamento al cliente e notifica interna separata solo a pagamento realmente confermato via webhook Stripe. Pannello impostazioni per immagini, colori, prezzo, date, dati statistici, dati legali/aziendali e link al corso pratico.
- * Version:             3.7.7
+ * Version:             3.7.8
  * Requires at least:   6.0
  * Requires PHP:        7.4
  * Author:              Formalife
  * Text Domain:         guida-antipanico-soffocamento
  * License:             GPL v2 or later
  * Update URI:          https://github.com/formalife/plugin-guida-al-soffocamento/
+ * Requires Plugins:    formalife-core
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /* -----------------------------------------------------------------------
  * Costanti del plugin
  * ---------------------------------------------------------------------*/
-define( 'GAPS_VERSION', '3.7.7' );
+define( 'GAPS_VERSION', '3.7.8' );
 define( 'GAPS_PLUGIN_FILE', __FILE__ );
 define( 'GAPS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GAPS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

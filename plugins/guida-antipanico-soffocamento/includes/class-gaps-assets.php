@@ -4,8 +4,9 @@
  * pubbliche gestite dal plugin: landing, condizioni di vendita, privacy,
  * grazie, i-miei-numeri) sia lato admin (solo sulla pagina impostazioni).
  *
- * v3.7: niente più Google Fonts (sostituiti da @font-face locali, vedi
- * assets/css/fonts.css), niente più Stripe.js caricato staticamente (vedi
+ * v3.7: niente più Google Fonts (sostituiti da @font-face locali, spostate
+ * in formalife-core dalla v3.7.6 — vedi formalife-core/assets/css/fonts.css),
+ * niente più Stripe.js caricato staticamente (vedi
  * assets/js/gaps-stripe-loader.js, richiamato solo al primo click su un
  * CTA), Meta Pixel opzionale e sempre ritardato (vedi
  * assets/js/gaps-meta-pixel-loader.js), dimensioni immagine dedicate
@@ -21,10 +22,12 @@ class GAPS_Assets {
 	/**
 	 * File WOFF2 critici (usati sopra la piega, nella barra in alto e nella
 	 * Hero): sono gli unici precaricati in <head>, e solo se il file esiste
-	 * già su disco in assets/fonts/ (nessun preload verso un file 404, vedi
-	 * output_font_preloads()). Gli altri pesi/font dichiarati in
-	 * assets/css/fonts.css (Lora, usato solo più in basso nella pagina) non
-	 * vengono mai precaricati.
+	 * già su disco in formalife-core/assets/fonts/ (nessun preload verso un
+	 * file 404 — la verifica vive in formalife_core_output_font_preloads(),
+	 * v3.7.6: la lista dei pesi resta qui perché solo questo plugin sa quali
+	 * pesi usa sopra la piega, formalife-core resta agnostico su questo).
+	 * Gli altri pesi/font dichiarati in formalife-core/assets/css/fonts.css
+	 * (Lora, usato solo più in basso nella pagina) non vengono mai precaricati.
 	 */
 	const CRITICAL_FONT_FILES = array(
 		'fredoka-600.woff2',
@@ -102,20 +105,15 @@ class GAPS_Assets {
 			return;
 		}
 
-		foreach ( self::CRITICAL_FONT_FILES as $font_file ) {
-			$disk_path = GAPS_PLUGIN_DIR . 'assets/fonts/' . $font_file;
-			if ( ! file_exists( $disk_path ) ) {
-				// Nessun file ancora presente in assets/fonts/: niente
-				// preload, per non generare una richiesta 404. Vedi
-				// assets/fonts/README.txt per l'elenco dei file attesi.
-				continue;
-			}
-
-			printf(
-				'<link rel="preload" as="font" type="font/woff2" href="%s" crossorigin>' . "\n",
-				esc_url( GAPS_PLUGIN_URL . 'assets/fonts/' . $font_file )
-			);
+		if ( ! function_exists( 'formalife_core_output_font_preloads' ) ) {
+			// formalife-core non attivo: nessun preload, il CSS ricade sui
+			// font di sistema (font-display: optional già lo gestisce senza
+			// errori). "Requires Plugins" dovrebbe impedire questo scenario
+			// su WP 6.5+, ma su versioni precedenti non è imposto.
+			return;
 		}
+
+		formalife_core_output_font_preloads( self::CRITICAL_FONT_FILES );
 	}
 
 	/**
@@ -135,21 +133,22 @@ class GAPS_Assets {
 			return;
 		}
 
-		// Font locali (vedi assets/css/fonts.css): nessuna richiesta verso
-		// fonts.googleapis.com / fonts.gstatic.com. Caricato come
-		// dipendenza di gaps-frontend così le dichiarazioni @font-face sono
-		// sempre disponibili prima del CSS che le usa.
-		wp_enqueue_style(
-			'gaps-fonts',
-			GAPS_PLUGIN_URL . 'assets/css/fonts.css',
-			array(),
-			GAPS_VERSION
-		);
+		// Token/font/componenti condivisi (v3.7.6): vedi formalife-core.
+		// Guardia difensiva — "Requires Plugins" dovrebbe già impedire
+		// l'attivazione di questo plugin senza formalife-core (WP 6.5+),
+		// ma su versioni precedenti non è imposto: se manca, il CSS di
+		// questo plugin ricade sui valori di fallback dichiarati in ogni
+		// var(--fmls-..., <fallback>) invece di un foglio di stile mancante.
+		$core_deps = array();
+		if ( function_exists( 'formalife_core_enqueue' ) ) {
+			$core_handles = formalife_core_enqueue();
+			$core_deps    = array( $core_handles['components'] );
+		}
 
 		wp_enqueue_style(
 			'gaps-frontend',
 			GAPS_PLUGIN_URL . 'assets/css/frontend.css',
-			array( 'gaps-fonts' ),
+			$core_deps,
 			GAPS_VERSION
 		);
 

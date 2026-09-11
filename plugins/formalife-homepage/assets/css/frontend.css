@@ -47,8 +47,13 @@
 	--fmh-radius: var(--fmls-radius, 20px);
 	--fmh-radius-sm: var(--fmls-radius-sm, 12px);
 	--fmh-max-w: var(--fmls-max-w, 1120px);
-	--fmh-font-display: var(--fmls-font-display, 'Fredoka', system-ui, sans-serif);
-	--fmh-font-body: var(--fmls-font-body, 'Karla', system-ui, sans-serif);
+
+	/* Stack di fallback allineato a quello di course.css/formalife-core
+	   (prima divergeva su system-ui): stesso ruolo, stesso fallback ovunque
+	   nel plugin — vedi audit di coerenza token, DECISIONI-TECNICHE.md
+	   2026-09-11. */
+	--fmh-font-display: var(--fmls-font-display, 'Fredoka', 'Arial Rounded MT Bold', Arial, sans-serif);
+	--fmh-font-body: var(--fmls-font-body, 'Karla', Arial, sans-serif);
 	--fmh-font-story: var(--fmls-font-story, 'Lora', Georgia, serif);
 
 	/* Eccezione: colori del plugin del libro, solo per la sezione 5 — ora
