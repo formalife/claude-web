@@ -136,6 +136,11 @@ function fmh_default_settings() {
 
 		// Notifiche lista d'attesa corso (sezione 6).
 		'notify_email' => 'info@formalife.it',
+
+		// Sicurezza — vedi uninstall.php. Falso di default: disinstallare
+		// il plugin (Bacheca → Plugin → Elimina) NON cancella nulla finché
+		// questa casella non viene spuntata esplicitamente in impostazioni.
+		'allow_uninstall_wipe' => false,
 	);
 }
 

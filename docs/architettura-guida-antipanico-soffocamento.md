@@ -3,8 +3,8 @@ title: "Architettura — plugin guida-antipanico-soffocamento"
 progetto: "Formalife, Sviluppo Web & Plugin"
 tipo: "riferimento tecnico"
 status: "vivo (aggiornare ad ogni modifica strutturale)"
-versione_plugin_al: "3.7.6"
-ultimo_aggiornamento: "2026-09-10"
+versione_plugin_al: "3.7.7"
+ultimo_aggiornamento: "2026-09-11"
 ---
 
 # Architettura — plugin `guida-antipanico-soffocamento`
@@ -14,11 +14,17 @@ libro "La Guida Anti-Panico al Soffocamento Pediatrico". Obiettivo: chi riprende
 lavoro (umano o Claude) capisce in due minuti dove intervenire, senza rileggere tutto
 il codice da capo.
 
-**Dipendenza (dalla v3.7.6):** questo plugin richiede `formalife-core` attivo
-(header `Requires Plugins`). Token di colore/font/spaziatura e le
-dichiarazioni `@font-face` vengono da lì — vedi
-`docs/architettura-formalife-core.md` per il dettaglio, e la sezione 3 di
-quel documento per cosa è stato migrato e cosa no in questa integrazione.
+**Dipendenza da formalife-core: costruita ma NON ancora applicata al sorgente
+coordinato.** Esiste uno zip `guida-antipanico-soffocamento_v3_7_6.zip` in
+questa stessa cartella che integra formalife-core (token colore/font/spaziatura
+e `@font-face` da lì, header `Requires Plugins`) — vedi
+`docs/architettura-formalife-core.md` §3 per il dettaglio di cosa migrerebbe e
+cosa no. Il sorgente coordinato in `plugins/guida-antipanico-soffocamento/`
+**non la include**: la v3.7.7 (sicurezza uninstall, vedi sotto) parte
+direttamente dalla 3.7.5, per non introdurre in questa sessione — dedicata a
+un incidente di sicurezza su un plugin di pagamenti live — una modifica
+visiva/di dipendenza non richiesta. Applicare quello zip al sorgente resta un
+passo esplicito, separato, da fare quando richiesto — vedi §8.
 
 **Se stai per modificare qualcosa che non trovi descritto qui, il documento è
 disallineato dal codice reale allegato in conversazione: fidati del codice, poi
@@ -92,8 +98,32 @@ pagato** — sono due configurazioni distinte. Dalla v3.7.1 c'è un avviso dedic
 bacheca proprio per questo scenario (`class-gaps-admin-notices.php`); se in futuro
 sparisce o smette di comparire, è una regressione da correggere subito.
 
+## 6bis. Sicurezza alla disinstallazione (dalla v3.7.7)
+
+`uninstall.php` cancella impostazioni (`gaps_settings` — comprese le chiavi
+Stripe) e le pagine generate, ma **solo se** `gaps_settings['allow_uninstall_wipe']`
+è esplicitamente `true` (checkbox "Cancella i dati alla disinstallazione" in
+impostazioni, falsa di default). Se non è spuntata, `uninstall.php` esce
+subito (`return;`) senza toccare nulla.
+
+**Motivo:** vedi lo stesso meccanismo su `formalife-homepage` §6bis del suo
+documento di architettura, e `DECISIONI-TECNICHE.md` (2026-09-11) — un
+aggiornamento fatto eliminando il plugin attivo per caricarne uno più
+recente (necessario perché WordPress non sovrascrive un plugin già
+installato via upload) ha innescato `uninstall.php` su `formalife-homepage`
+e cancellato dati reali. Questo plugin aveva lo stesso identico pattern
+(nessuna guardia), corretto qui per prevenzione anche se l'incidente non lo
+ha coinvolto direttamente. **Nota:** a differenza di `formalife-homepage`,
+questo `uninstall.php` non cancella CPT di ordini (`gaps_preorder` non è
+tra le cose rimosse) — solo impostazioni e pagine.
+
 ## 7. Changelog (sintesi — dettaglio completo in `readme.txt` del plugin)
-- **3.7.6** — Nuova dipendenza `formalife-core`: token colore/font/spaziatura
+- **3.7.7** — Sicurezza: `uninstall.php` richiede consenso esplicito
+  (`allow_uninstall_wipe`, falso di default) prima di cancellare
+  impostazioni/pagine — vedi §6bis. Parte direttamente dalla 3.7.5 (la 3.7.6,
+  dipendenza formalife-core, resta pendente/non applicata — vedi sopra e §8).
+- **3.7.6** — Costruita come zip, non ancora applicata al sorgente
+  coordinato (vedi sopra). Nuova dipendenza `formalife-core`: token colore/font/spaziatura
   e font @font-face migrati lì (con fallback espliciti, zero cambiamento
   visivo previsto). Classi CSS proprie (`gaps-*`) non toccate — vedi
   `docs/architettura-formalife-core.md` §3.
@@ -118,6 +148,11 @@ sparisce o smette di comparire, è una regressione da correggere subito.
   momento: **flat**, assunzione non ancora confermata esplicitamente.
 - Nome/contenuto degli altri plugin Formalife da registrare in `claude-web` — da
   aggiungere non appena disponibili (codice e/o descrizione).
+- **Applicare la dipendenza da formalife-core (v3.7.6) al sorgente coordinato**:
+  costruita, verificata, mai applicata (vedi intestazione del documento).
+  Richiede una conferma esplicita prima di procedere, trattandosi di un
+  plugin di pagamenti live — poi versionare come 3.7.8 (3.7.7 è già presa
+  dalla sicurezza uninstall).
 
 ## 9. Distribuzione e aggiornamenti
 Il plugin include **Plugin Update Checker** (libreria di YahnisElsts, vendorizzata

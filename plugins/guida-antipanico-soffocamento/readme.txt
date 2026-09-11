@@ -4,7 +4,7 @@ Tags: landing page, ecommerce, stripe, pediatria
 Requires at least: 6.0
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 3.7.5
+Stable tag: 3.7.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,10 @@ Se le chiavi Stripe non sono ancora configurate, il popup funziona comunque (il 
 5. Sempre nel pannello impostazioni, sezione "Notifiche e conferma di pagamento": copia l'URL dell'endpoint webhook mostrato lì, incollalo in Stripe → Sviluppatori → Webhook → Aggiungi endpoint (eventi: payment_intent.succeeded, payment_intent.payment_failed), poi incolla nel plugin la chiave segreta ("Signing secret") che Stripe ti mostra. Senza questo passaggio i pagamenti vanno comunque a buon fine, ma il plugin non può segnarli come "Pagato" né inviare le email di conferma.
 
 == Changelog ==
+
+= 3.7.7 =
+* Sicurezza: disinstallare il plugin (Bacheca → Plugin → Elimina) non cancella più automaticamente impostazioni (comprese le chiavi Stripe) e pagine generate. Serve prima spuntare "Cancella i dati alla disinstallazione" in impostazioni (falsa di default). Prima di questa versione, eliminare il plugin per sostituirlo con uno zip più recente cancellava questi dati senza preavviso.
+* Nota: questa versione parte direttamente dalla 3.7.5. La 3.7.6 (dipendenza da formalife-core, costruita ma non ancora applicata al sorgente coordinato) resta una modifica separata e pendente — vedi docs/DECISIONI-TECNICHE.md.
 
 = 3.7.5 =
 * Corretto il modello di repository: `github.com/formalife/claude-web` (introdotto in 3.7.4) resta il workspace di coordinamento per tutti i plugin Formalife, ma la sorgente degli aggiornamenti automatici di questo plugin punta ora a un repository dedicato, `github.com/formalife/plugin-guida-al-soffocamento`, sincronizzato da `claude-web` ad ogni rilascio. Necessario perché Plugin Update Checker legge il changelog solo dalla radice del repository, e più plugin coordinati nello stesso repo di sviluppo ne avrebbero uno solo alla radice.

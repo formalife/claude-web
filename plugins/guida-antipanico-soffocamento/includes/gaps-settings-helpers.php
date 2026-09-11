@@ -153,6 +153,11 @@ function gaps_default_settings() {
 		 * assets/js/gaps-meta-pixel-loader.js).
 		 */
 		'meta_pixel_id' => '',
+
+		// Sicurezza — vedi uninstall.php. Falso di default: disinstallare
+		// il plugin (Bacheca → Plugin → Elimina) NON cancella nulla finché
+		// questa casella non viene spuntata esplicitamente in impostazioni.
+		'allow_uninstall_wipe' => false,
 	);
 }
 

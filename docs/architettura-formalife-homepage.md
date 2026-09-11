@@ -3,8 +3,8 @@ title: "Architettura — plugin formalife-homepage"
 progetto: "Formalife, Sviluppo Web & Plugin"
 tipo: "riferimento tecnico"
 status: "vivo (aggiornare ad ogni modifica strutturale)"
-versione_plugin_al: "4.6.4"
-ultimo_aggiornamento: "2026-09-10"
+versione_plugin_al: "4.6.5"
+ultimo_aggiornamento: "2026-09-11"
 ---
 
 # Architettura — plugin `formalife-homepage`
@@ -127,7 +127,40 @@ accettata dal solo browser.
    HMAC verificata con tolleranza 300s) — aggiorna stato ordine, consuma
    l'eventuale codice riservato, innesca l'invio Purchase a Meta CAPI.
 
+## 6bis. Sicurezza alla disinstallazione (dalla v4.6.5)
+
+`uninstall.php` cancella impostazioni (`fmh_settings`, `fmh_course_settings`
+— comprese le chiavi Stripe), tutti gli ordini corso (CPT `fmh_course_order`)
+e le pagine generate, ma **solo se** `fmh_settings['allow_uninstall_wipe']`
+è esplicitamente `true` (checkbox "Cancella i dati alla disinstallazione" in
+impostazioni, falsa di default). Se la casella non è spuntata, `uninstall.php`
+esce subito (`return;`) senza toccare nulla.
+
+**Perché esiste questa guardia:** WordPress non permette di caricare uno zip
+con lo stesso slug di un plugin già installato — per sostituirlo bisogna
+prima "Disattiva" + **"Elimina"**, e "Elimina" è esattamente ciò che innesca
+`uninstall.php`. Prima di questa versione, un aggiornamento fatto in questo
+modo cancellava silenziosamente impostazioni e ordini reali (successo il
+2026-09-11, vedi `DECISIONI-TECNICHE.md`). Le immagini della Libreria Media
+non erano/non sono mai state cancellate da questo file: solo i riferimenti
+(ID) salvati nelle impostazioni.
+
+**Implicazione operativa:** per un normale aggiornamento di versione, lascia
+la casella deselezionata (default) — "Elimina" seguito da un nuovo upload
+non cancellerà più nulla. Spuntala solo quando l'intento è davvero smontare
+il plugin e ripulire il sito.
+
 ## 7. Changelog (sintesi — dettaglio completo in `readme.txt` del plugin)
+- **4.6.5** — Sicurezza: `uninstall.php` non cancella più automaticamente
+  impostazioni (chiavi Stripe comprese), ordini corso e pagine generate al
+  primo "Elimina" da bacheca. Serve prima spuntare "Cancella i dati alla
+  disinstallazione" nel pannello impostazioni (`allow_uninstall_wipe`,
+  falso di default). **Motivo:** in questa stessa sessione, un
+  aggiornamento del plugin fatto eliminando la versione attiva per
+  caricarne una più recente (necessario perché WordPress non sovrascrive
+  un plugin già installato via upload) ha attivato `uninstall.php` e
+  cancellato impostazioni, chiavi Stripe e ordini reali — vedi
+  `DECISIONI-TECNICHE.md`, voce 2026-09-11.
 - **4.6.4** — Nuova dipendenza `formalife-core`: font e sottoinsieme di
   token realmente condivisi migrati lì (fallback espliciti, zero cambiamento
   visivo previsto per la palette propria). Vedi §4.

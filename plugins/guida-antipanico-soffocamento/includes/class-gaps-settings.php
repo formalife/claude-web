@@ -156,6 +156,11 @@ class GAPS_Settings {
 		$output['notify_email']          = isset( $input['notify_email'] ) ? sanitize_email( wp_unslash( $input['notify_email'] ) ) : $defaults['notify_email'];
 		$output['stripe_webhook_secret'] = isset( $input['stripe_webhook_secret'] ) ? sanitize_text_field( wp_unslash( $input['stripe_webhook_secret'] ) ) : '';
 
+		// Sicurezza — vedi uninstall.php: la casella deve essere spuntata di
+		// proposito ad ogni salvataggio, non basta averla spuntata una volta
+		// in passato. Sempre falso se il checkbox non è presente nel POST.
+		$output['allow_uninstall_wipe'] = ! empty( $input['allow_uninstall_wipe'] );
+
 		return $output;
 	}
 
@@ -620,6 +625,22 @@ class GAPS_Settings {
 					<tr>
 						<th scope="row"><label for="gaps_stat_source"><?php esc_html_e( 'Fonte', 'guida-antipanico-soffocamento' ); ?></label></th>
 						<td><input type="text" id="gaps_stat_source" name="<?php echo esc_attr( GAPS_OPTION_KEY ); ?>[stat_source]" value="<?php echo esc_attr( $settings['stat_source'] ); ?>" class="large-text" /></td>
+					</tr>
+				</table>
+
+				<h2 class="title"><?php esc_html_e( 'Sicurezza — disinstallazione', 'guida-antipanico-soffocamento' ); ?></h2>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Cancella i dati alla disinstallazione', 'guida-antipanico-soffocamento' ); ?></th>
+						<td>
+							<label for="gaps_allow_uninstall_wipe">
+								<input type="checkbox" id="gaps_allow_uninstall_wipe" name="<?php echo esc_attr( GAPS_OPTION_KEY ); ?>[allow_uninstall_wipe]" value="1" <?php checked( $settings['allow_uninstall_wipe'], true ); ?> />
+								<?php esc_html_e( 'Sì, alla disinstallazione (Bacheca → Plugin → Elimina) cancella impostazioni e pagine generate (landing, condizioni, privacy, grazie, numeri).', 'guida-antipanico-soffocamento' ); ?>
+							</label>
+							<p class="description" style="color:#b32d2e;">
+								<?php esc_html_e( 'Lascia questa casella deselezionata se vuoi solo aggiornare i file del plugin (es. caricando uno zip più recente): con la casella deselezionata, eliminare il plugin da Bacheca → Plugin non tocca nessun dato — impostazioni, chiavi Stripe e pagine restano intatte. Spuntala solo se vuoi davvero ripulire tutto.', 'guida-antipanico-soffocamento' ); ?>
+							</p>
+						</td>
 					</tr>
 				</table>
 

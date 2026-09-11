@@ -4,7 +4,7 @@ Tags: homepage, landing page, formalife
 Requires at least: 6.0
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 4.6.4
+Stable tag: 4.6.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,9 @@ Bacheca WordPress → menu laterale "Formalife Home" (icona casa). In cima alla 
 5. Vai su Bacheca → Impostazioni → Lettura e imposta "Home" come pagina iniziale del sito, se non lo è già.
 
 == Changelog ==
+
+= 4.6.5 =
+* Sicurezza: disinstallare il plugin (Bacheca → Plugin → Elimina) non cancella più automaticamente impostazioni (comprese le chiavi Stripe), iscrizioni al corso e pagine generate. Serve prima spuntare "Cancella i dati alla disinstallazione" in impostazioni (falsa di default). Prima di questa versione, eliminare il plugin per sostituirlo con uno zip più recente cancellava questi dati senza preavviso.
 
 = 4.6.4 =
 * Nuova dipendenza: formalife-core (plugin condiviso di stile/token/componenti tra i plugin Formalife, stesso modello adottato da guida-antipanico-soffocamento in v3.7.6 — va attivato insieme a questo). Font locali (Fredoka/Karla/Lora) spostati in formalife-core: rimossi da questo plugin assets/css/fonts.css e assets/fonts/.

@@ -4,10 +4,25 @@
  * che in WordPress richiede già una conferma da parte dell'utente.
  * Alla semplice disattivazione, invece, impostazioni e pagine restano intatte
  * (vedi GAPS_Page_Manager::on_deactivation()).
+ *
+ * v3.7.7: questa pulizia è distruttiva (cancella impostazioni — comprese le
+ * chiavi Stripe — e le pagine generate) e prima d'ora partiva in automatico
+ * al primo "Elimina", incluso quando l'intento era solo sostituire i file
+ * del plugin con una versione più recente (che in WordPress richiede di
+ * eliminare il plugin esistente prima di poterne caricare uno nuovo con lo
+ * stesso slug). Ora richiede un consenso esplicito salvato in anticipo
+ * dall'admin (casella "Cancella i dati alla disinstallazione" nel pannello
+ * impostazioni, falsa di default): se non è stata spuntata, questo file
+ * esce subito senza cancellare nulla.
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
+}
+
+$gaps_settings = get_option( 'gaps_settings' );
+if ( ! is_array( $gaps_settings ) || empty( $gaps_settings['allow_uninstall_wipe'] ) ) {
+	return;
 }
 
 $gaps_option_key       = 'gaps_settings';

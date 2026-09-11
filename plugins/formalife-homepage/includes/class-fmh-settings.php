@@ -129,6 +129,11 @@ class FMH_Settings {
 		// Notifiche lista d'attesa corso.
 		$output['notify_email'] = isset( $input['notify_email'] ) ? sanitize_email( wp_unslash( $input['notify_email'] ) ) : $defaults['notify_email'];
 
+		// Sicurezza — vedi uninstall.php: la casella deve essere spuntata di
+		// proposito ad ogni salvataggio, non basta averla spuntata una volta
+		// in passato. Sempre falso se il checkbox non è presente nel POST.
+		$output['allow_uninstall_wipe'] = ! empty( $input['allow_uninstall_wipe'] );
+
 		return $output;
 	}
 
@@ -532,6 +537,22 @@ class FMH_Settings {
 					<tr>
 						<th scope="row"><label for="fmh_privacy_url"><?php esc_html_e( 'Privacy (URL)', 'formalife-homepage' ); ?></label></th>
 						<td><input type="url" id="fmh_privacy_url" name="<?php echo esc_attr( FMH_OPTION_KEY ); ?>[privacy_url]" value="<?php echo esc_attr( $settings['privacy_url'] ); ?>" class="regular-text" /></td>
+					</tr>
+				</table>
+
+				<h2 class="title"><?php esc_html_e( 'Sicurezza — disinstallazione', 'formalife-homepage' ); ?></h2>
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Cancella i dati alla disinstallazione', 'formalife-homepage' ); ?></th>
+						<td>
+							<label for="fmh_allow_uninstall_wipe">
+								<input type="checkbox" id="fmh_allow_uninstall_wipe" name="<?php echo esc_attr( FMH_OPTION_KEY ); ?>[allow_uninstall_wipe]" value="1" <?php checked( $settings['allow_uninstall_wipe'], true ); ?> />
+								<?php esc_html_e( 'Sì, alla disinstallazione (Bacheca → Plugin → Elimina) cancella impostazioni, iscrizioni al corso e pagine generate.', 'formalife-homepage' ); ?>
+							</label>
+							<p class="description" style="color:#b32d2e;">
+								<?php esc_html_e( 'Lascia questa casella deselezionata se vuoi solo aggiornare i file del plugin (es. caricando uno zip più recente): con la casella deselezionata, eliminare il plugin da Bacheca → Plugin non tocca nessun dato — impostazioni, chiavi Stripe, date dei corsi e iscrizioni restano intatte. Spuntala solo se vuoi davvero ripulire tutto.', 'formalife-homepage' ); ?>
+							</p>
+						</td>
 					</tr>
 				</table>
 

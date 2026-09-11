@@ -22,6 +22,51 @@ non si rispiega da zero ogni volta e non si ripetono errori già risolti.
 
 ## A. Decisioni validate
 
+### 2026-09-11 · Incidente: uninstall.php ha cancellato dati reali su formalife-homepage
+- **Cosa è successo:** per sostituire il plugin `formalife-homepage` attivo sul
+  sito live con uno zip più recente, è stato necessario prima eliminarlo da
+  Bacheca → Plugin (WordPress non sovrascrive un plugin già installato via
+  upload con lo stesso slug). Il click su "Elimina" ha innescato
+  `uninstall.php`, che — comportamento preesistente, non introdotto in questa
+  sessione — cancellava incondizionatamente: impostazioni (`fmh_settings`,
+  `fmh_course_settings`, comprese le **chiavi Stripe**, le date/sessioni
+  corso, i prezzi, i codici riservati), **tutti gli ordini/iscrizioni al
+  corso** (CPT `fmh_course_order`) e le pagine generate. Le immagini della
+  Libreria Media non sono state cancellate (solo i riferimenti salvati nelle
+  impostazioni).
+- **Diagnosi:** confermata leggendo il codice — nessuna modifica fatta in
+  questa sessione ha toccato `uninstall.php` prima dell'incidente; il file
+  era identico in ogni versione del plugin confrontata. Causa: nessuna
+  guardia impediva la cancellazione automatica alla semplice disinstallazione
+  da bacheca (che richiede solo il "Elimina" già presente nella UI di
+  WordPress, non un consenso specifico per *questo* plugin).
+- **Decisione:** aggiunta una casella "Cancella i dati alla disinstallazione"
+  (`allow_uninstall_wipe`, falsa di default) nel pannello impostazioni di
+  **entrambi** i plugin che hanno un `uninstall.php` distruttivo
+  (`formalife-homepage` e `guida-antipanico-soffocamento`, che aveva lo
+  stesso identico pattern anche se non coinvolto nell'incidente). Se la
+  casella non è spuntata, `uninstall.php` esce subito senza cancellare nulla
+  — un aggiornamento fatto con "Elimina" + nuovo upload ora è sicuro di
+  default.
+- **Tipo:** sicurezza/bugfix.
+- **Recupero dati:** non nelle mie possibilità — nomi, chiavi Stripe, date
+  corsi e ordini non sono mai stati in nessun file di codice/zip, solo nel
+  database del sito. Indicato al proprietario di controllare backup
+  hosting/database; i pagamenti reali restano comunque tracciati lato Stripe
+  (fonte di verità indipendente da WordPress).
+- **Toccati:** `includes/fmh-settings-helpers.php`, `includes/class-fmh-settings.php`,
+  `uninstall.php` — plugin `formalife-homepage`, v4.6.4 → **v4.6.5**.
+  `includes/gaps-settings-helpers.php`, `includes/class-gaps-settings.php`,
+  `uninstall.php` — plugin `guida-antipanico-soffocamento`, v3.7.5 →
+  **v3.7.7** (salta deliberatamente la 3.7.6, che resta la dipendenza
+  formalife-core non ancora applicata al sorgente — vedi voce successiva e
+  `docs/architettura-guida-antipanico-soffocamento.md`).
+- **Non fatto deliberatamente:** non ho applicato in questa sessione la
+  dipendenza formalife-core (v3.7.6, già costruita in zip) al sorgente di
+  `guida-antipanico-soffocamento` — avrebbe mescolato una modifica di stile
+  non richiesta dentro una sessione dedicata a un incidente di sicurezza su
+  un plugin di pagamenti live. Resta un passo esplicito separato.
+
 ### 2026-09-10 · Bug: pagamenti Stripe non registrati come "Pagato"
 - **Decisione:** il pannello impostazioni ora avvisa esplicitamente (avviso dedicato,
   visibile in tutta la bacheca) quando le chiavi Stripe sono configurate ma manca la

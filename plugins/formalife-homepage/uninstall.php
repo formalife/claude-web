@@ -1,8 +1,24 @@
 <?php
 /**
- * Pulizia eseguita solo alla disinstallazione esplicita del plugin.
+ * Pulizia eseguita solo alla disinstallazione esplicita del plugin
+ * (Bacheca → Plugin → Elimina).
+ *
+ * v4.6.5: questa pulizia è distruttiva (cancella impostazioni — comprese
+ * le chiavi Stripe — e ogni iscrizione al corso) e prima d'ora partiva in
+ * automatico al primo "Elimina", incluso quando l'intento era solo
+ * sostituire i file del plugin con una versione più recente (che in
+ * WordPress richiede di eliminare il plugin esistente prima di poterne
+ * caricare uno nuovo con lo stesso slug). Ora richiede un consenso
+ * esplicito salvato in anticipo dall'admin (casella "Cancella i dati alla
+ * disinstallazione" nel pannello impostazioni, falsa di default): se non è
+ * stata spuntata, questo file esce subito senza cancellare nulla.
  */
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) { exit; }
+
+$fmh_settings = get_option( 'fmh_settings' );
+if ( ! is_array( $fmh_settings ) || empty( $fmh_settings['allow_uninstall_wipe'] ) ) {
+	return;
+}
 
 $pages = array(
 	array( 'option' => 'fmh_home_page_id', 'meta' => '_fmh_home_page', 'conflict' => 'fmh_page_conflict_home' ),
