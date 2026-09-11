@@ -52,7 +52,8 @@ ogni volta.
 
 Dettaglio completo, incluso perché guida-antipanico-soffocamento non è
 stato migrato per intero alle classi `.fmls-*` (solo ai token), in
-`docs/architettura-formalife-core.md` nel repository `claude-web`.
+`docs/architettura-formalife-core.md` nel repository `wordpress-web` (rinominato da
+`claude-web` il 2026-09-11).
 
 == Changelog ==
 

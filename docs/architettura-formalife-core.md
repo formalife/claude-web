@@ -85,7 +85,7 @@ richiesta esplicita del proprietario (preferenza visiva) — dettaglio in
 ## 4. Distribuzione
 Non ha (ancora) un repository di distribuzione dedicato in stile Plugin
 Update Checker: a differenza di `guida-antipanico-soffocamento`, per ora
-vive solo in `claude-web/plugins/formalife-core/` e si installa copiandolo a
+vive solo in `wordpress-web/plugins/formalife-core/` e si installa copiandolo a
 mano su WordPress. Decisione deliberata per non aggiungere infrastruttura
 (un terzo repository, un'altra Release da mantenere) finché non serve
 davvero — se in futuro cambia spesso indipendentemente dai plugin che lo

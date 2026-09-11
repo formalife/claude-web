@@ -153,7 +153,7 @@ tra le cose rimosse) — solo impostazioni e pagine.
 ## 8. Decisioni aperte / da confermare col proprietario
 - La spedizione scala con la quantità di copie, o resta sempre flat per ordine? Al
   momento: **flat**, assunzione non ancora confermata esplicitamente.
-- Nome/contenuto degli altri plugin Formalife da registrare in `claude-web` — da
+- Nome/contenuto degli altri plugin Formalife da registrare in `wordpress-web` — da
   aggiungere non appena disponibili (codice e/o descrizione).
 - Se/quando migrare le classi CSS proprie (`gaps-*`) a `fmls-*` per intero
   (vedi `docs/architettura-formalife-core.md` §3) — non fatto nell'audit di
@@ -168,11 +168,12 @@ bacheca.
 
 **Modello a due livelli** (deciso il 2026-09-10, quando è emerso che esistono già
 altri plugin Formalife oltre a questo — vedi `DECISIONI-TECNICHE.md`):
-- Il codice sorgente di questo plugin vive in `claude-web/plugins/guida-antipanico-soffocamento/`
-  (workspace di coordinamento, condiviso con gli altri plugin Formalife).
+- Il codice sorgente di questo plugin vive in `wordpress-web/plugins/guida-antipanico-soffocamento/`
+  (rinominato da `claude-web` l'11/09/2026 — workspace di coordinamento, condiviso
+  con gli altri plugin Formalife).
 - L'aggiornamento automatico via GitHub punta invece a un repository **dedicato**,
   solo per questo plugin: `github.com/formalife/plugin-guida-al-soffocamento`,
-  sincronizzato da `claude-web` con `scripts/sync-plugin-release.sh` al momento del
+  sincronizzato da `wordpress-web` con `scripts/sync-plugin-release.sh` al momento del
   rilascio (non ad ogni commit).
 - **Motivo verificato leggendo la libreria vendorizzata (non un'ipotesi):**
   `getRemoteFile()` in `Vcs/GitHubApi.php` cerca sempre `readme.txt` alla radice del
@@ -189,7 +190,7 @@ Configurazione:
   ognuna abbia un **release asset** (zip allegato) il cui nome rispetti
   `guida-antipanico-soffocamento(-vX.X.X)?.zip`. Il workflow
   `.github/workflows/build-release.yml`, che vive nel repository di distribuzione
-  (non in claude-web), lo genera e allega da solo a ogni Release pubblicata.
+  (non in wordpress-web), lo genera e allega da solo a ogni Release pubblicata.
 - Per ogni release: versione bumpata in tre punti coerenti (header `Version:`,
   `GAPS_VERSION`, `Stable tag` in `readme.txt`) + voce di changelog — vedi §7.
 

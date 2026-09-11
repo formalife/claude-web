@@ -1,8 +1,17 @@
-# claude-web
+# wordpress-web
 
-Workspace di coordinamento per tutto lo sviluppo web di Formalife — più plugin,
-documentazione tecnica condivisa, un solo posto dove Claude (in chat o in Claude
-Code) trova il contesto senza bisogno di rispiegazioni.
+**Rinominato da `claude-web` il 2026-09-11.** Formalife ha deciso di consolidare lo
+sviluppo attorno a [`formalife/formalife-web`](https://github.com/formalife/formalife-web)
+(Astro + Cloudflare Workers, in costruzione). Questo repository resta il workspace di
+manutenzione del **sito WordPress attualmente live** (formalife.it) finché il cutover
+verso `formalife-web` non è pronto — nessun cutover urgente deciso, ma nessun nuovo
+investimento pesante qui oltre a bugfix/sicurezza, per non duplicare lavoro che va
+comunque rifatto. Dettaglio della decisione in `docs/DECISIONI-TECNICHE.md`,
+2026-09-11.
+
+Workspace di coordinamento per tutto lo sviluppo WordPress di Formalife — più
+plugin, documentazione tecnica condivisa, un solo posto dove Claude (in chat o in
+Claude Code) trova il contesto senza bisogno di rispiegazioni.
 
 ## Perché due livelli di repository
 
@@ -12,7 +21,7 @@ sottocartelle per questo (verificato leggendo il codice, non un'ipotesi). Con pi
 plugin coordinati in un unico repository, solo uno potrebbe stare alla radice.
 
 Per questo:
-- **`claude-web` (qui)** — dove si sviluppa, si discute, si coordina. Ogni plugin ha
+- **`wordpress-web` (qui)** — dove si sviluppa, si discute, si coordina. Ogni plugin ha
   la sua sottocartella in `plugins/`.
 - **Un repository dedicato per ogni plugin che si aggiorna via GitHub** — es.
   `formalife/plugin-guida-al-soffocamento` — che contiene *solo* quel plugin, alla
@@ -25,7 +34,8 @@ Un plugin che non usa (ancora) l'aggiornamento automatico via GitHub resta solo 
 ## Cosa c'è qui
 
 - **`plugins/<slug>/`** — sorgente completo di ogni plugin. Attualmente:
-  `guida-antipanico-soffocamento` (libro).
+  `formalife-core` (stile/componenti condivisi), `formalife-homepage` (homepage +
+  landing corso), `guida-antipanico-soffocamento` (libro).
 - **`docs/`** — documentazione viva:
   - `DECISIONI-TECNICHE.md` — registro **unico**, trasversale a tutti i plugin: cosa
     è stato deciso, quando, perché.
@@ -45,7 +55,7 @@ Un plugin che non usa (ancora) l'aggiornamento automatico via GitHub resta solo 
    repository: commit, tag `vX.X.X`, push, Release GitHub con quel tag → il workflow
    lì dentro genera e allega lo zip da solo.
 4. Se la modifica è stata strutturale, aggiorna anche `docs/architettura-<slug>.md` e
-   `docs/DECISIONI-TECNICHE.md` **qui**, in claude-web.
+   `docs/DECISIONI-TECNICHE.md` **qui**, in wordpress-web.
 
 ## Aggiungere un nuovo plugin
 

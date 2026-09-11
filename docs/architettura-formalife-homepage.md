@@ -11,7 +11,8 @@ ultimo_aggiornamento: "2026-09-11"
 
 Plugin WordPress custom che genera la homepage istituzionale di Formalife e la
 landing/checkout del corso pratico "Genitori Pronti". Registrato in `claude-web`
-il 2026-09-10, contestualmente alla migrazione a `formalife-core` (vedi
+(rinominato `wordpress-web` l'11/09/2026, vedi `DECISIONI-TECNICHE.md`) il
+2026-09-10, contestualmente alla migrazione a `formalife-core` (vedi
 `DECISIONI-TECNICHE.md`, stessa data).
 
 **Dipendenza (dalla v4.6.4):** questo plugin richiede `formalife-core` attivo

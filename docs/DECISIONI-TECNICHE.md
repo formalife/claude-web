@@ -22,6 +22,45 @@ non si rispiega da zero ogni volta e non si ripetono errori già risolti.
 
 ## A. Decisioni validate
 
+### 2026-09-11 · Pivot strategico: formalife-web al centro, questo repo diventa manutenzione WordPress
+- **Contesto:** in questa stessa sessione è emerso — analizzando il filesystem
+  locale e gli altri repository GitHub dell'organizzazione — che esiste già un
+  secondo progetto, `formalife/formalife-web` (Astro + Cloudflare Workers +
+  D1 + Stripe nativo + Brevo), tecnicamente più maturo e disciplinato di
+  questo repo per la parte backend/CRM (Foundation Core e pannello Control
+  già in `main`, testati, con CI), ma con il sito pubblico (home/corso/guida/
+  checkout) ancora allo stadio di bozza (nessun deploy in produzione
+  autorizzato). Il suo stesso `AGENTS.md` dichiara esplicitamente di NON
+  considerare `formalife/formalife-platform` e `formalife/formalife-intelligence`
+  fonti di verità. Entrambi risultavano fermi da 2+ settimane; anche
+  `formalife-personal/formalife-os` risultava fermo da oltre un mese.
+- **Decisione:** il proprietario ha deciso di consolidare tutto lo sviluppo
+  intorno a `formalife-web`. Questo repository (`claude-web`) **non viene
+  abbandonato**, ma ridefinito: manutenzione del sito WordPress
+  **attualmente live** (formalife.it, pagamenti reali in corso), finché il
+  cutover verso `formalife-web` non è pronto. Cutover non urgente (nessuna
+  scadenza fissata), ma nessun nuovo investimento pesante qui oltre a
+  bugfix/sicurezza — lavoro che andrebbe comunque rifatto su formalife-web
+  non va duplicato qui.
+- **Azioni eseguite in questa sessione:**
+  1. Repository GitHub rinominato `formalife/claude-web` → `formalife/wordpress-web`
+     (redirect automatico di GitHub dal vecchio nome). Cartella locale
+     rinominata di conseguenza, remote `origin` aggiornato.
+  2. Riferimenti interni "correnti" (non storici) a `claude-web` aggiornati a
+     `wordpress-web` in `README.md` e nei `docs/architettura-*.md` — i
+     riferimenti nei changelog di `readme.txt` dei plugin, che descrivono
+     fatti storici avvenuti quando il repo si chiamava ancora `claude-web`,
+     **non sono stati riscritti** (sono cronaca, non stato corrente).
+  3. Archiviati su GitHub (reversibile: `gh repo unarchive` se serve):
+     `formalife/formalife-platform`, `formalife/formalife-intelligence`,
+     `formalife-personal/formalife-os`.
+  4. Clonato `formalife/formalife-web` in locale — vedi voce successiva per
+     l'esito dell'audit e della migrazione dei contenuti da Google Drive.
+- **Tipo:** infrastruttura/metodo di lavoro.
+- **Non fatto in questa voce:** la vera e propria migrazione dei contenuti
+  Drive e l'audit di `formalife-web` sono decisioni/azioni separate — vedi le
+  voci successive (stesso giorno) per il dettaglio.
+
 ### 2026-09-11 · Incidente: uninstall.php ha cancellato dati reali su formalife-homepage
 - **Cosa è successo:** per sostituire il plugin `formalife-homepage` attivo sul
   sito live con uno zip più recente, è stato necessario prima eliminarlo da
