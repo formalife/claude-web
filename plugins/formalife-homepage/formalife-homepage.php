@@ -3,7 +3,7 @@
  * Plugin Name:       Formalife — Homepage
  * Plugin URI:         https://formalife.it
  * Description:        Homepage Formalife + Corso Anti-Panico al Soffocamento Pediatrico, con sessioni dinamiche e checkout Stripe embedded.
- * Version:             4.6.7
+ * Version:             4.6.8
  * Requires at least:   6.0
  * Requires PHP:        7.4
  * Author:              Formalife
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * con le costanti "GAPS_*" del plugin "Guida Anti-Panico al Soffocamento
  * Pediatrico", pensato per restare attivo in parallelo sullo stesso sito.
  * ---------------------------------------------------------------------*/
-define( 'FMH_VERSION', '4.6.7' );
+define( 'FMH_VERSION', '4.6.8' );
 define( 'FMH_PLUGIN_FILE', __FILE__ );
 define( 'FMH_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'FMH_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

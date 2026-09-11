@@ -4,7 +4,7 @@ Tags: homepage, landing page, formalife
 Requires at least: 6.0
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 4.6.7
+Stable tag: 4.6.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,10 @@ Bacheca WordPress → menu laterale "Formalife Home" (icona casa). In cima alla 
 5. Vai su Bacheca → Impostazioni → Lettura e imposta "Home" come pagina iniziale del sito, se non lo è già.
 
 == Changelog ==
+
+= 4.6.8 =
+* Aggiunto evento Meta Pixel `InitiateCheckout` (solo browser) quando il PaymentIntent del corso è stato creato e il Payment Element viene mostrato: valore reale restituito dal backend (già presente nella risposta AJAX, nessuna modifica al checkout), EUR, content_id `formalife-course`, numero partecipanti, event_id stabile basato sull'ordine. Inviato solo se un Pixel Meta risulta già attivo in pagina (`window.fbq`); nessun Pixel viene caricato da questo plugin.
+* Nessuna modifica a UX, copy, prezzi, checkout Stripe o al Purchase server-side (resta esclusivamente business-verified dopo conferma webhook Stripe, invariato).
 
 = 4.6.7 =
 * Ripristinata la palette propria (blu/rosso/verde) sulla landing e sulla conferma del corso, su richiesta esplicita del proprietario: preferenza visiva rispetto allo stile core esatto adottato in 4.6.6, non un problema tecnico. Pulsante di acquisto di nuovo rosso.

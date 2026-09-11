@@ -22,6 +22,49 @@ non si rispiega da zero ogni volta e non si ripetono errori già risolti.
 
 ## A. Decisioni validate
 
+### 2026-09-11 · Tracking corso: aggiunto InitiateCheckout (browser), verificato stato Purchase CAPI
+- **Contesto:** richiesta di verificare il tracking Meta sulla landing corso
+  (eventi InitiateCheckout e Purchase), con un prompt tecnico proposto da
+  ChatGPT da valutare in autonomia prima di applicare.
+- **Verifica preliminare dal vivo (prima di scrivere codice):** navigata
+  `formalife.it/genitori-pronti/`, controllato `window.fbq` — è una funzione:
+  un Meta Pixel è attivo in pagina, iniettato da Google Tag Manager, **non**
+  da questo plugin (che non carica nessun Pixel). Confermato anche che il
+  sito live gira già su `formalife-core` v1.1.0 e `formalife-homepage`
+  v4.6.7 (deploy delle modifiche di questa stessa sessione già avvenuto).
+- **Decisione:** implementato `InitiateCheckout` lato browser in
+  `assets/js/course.js`, sparato quando il Payment Element viene mostrato
+  (PaymentIntent già creato server-side). Valore reale preso da
+  `amount_cents` — **già restituito dal backend nella risposta AJAX**
+  (calcolato da `fmh_course_resolve_price_cents()`), semplicemente ignorato
+  finora dal JS: **nessuna modifica al PHP del checkout è stata
+  necessaria**. Guardia `typeof window.fbq==='function'` prima di ogni
+  chiamata, coerente con come già si comporta il resto del codice
+  (`appendAttribution()` nello stesso file) — se il Pixel non è presente,
+  il tracking viene saltato, mai un errore che blocchi il pagamento.
+- **Valutazione del prompt ChatGPT:** applicato quasi interamente così
+  com'era (era tecnicamente corretto e ben scoped: "non modificare UX,
+  copy, prezzi, checkout Stripe o Purchase CAPI" rispettato alla lettera).
+  Unica aggiunta di giudizio tecnico non esplicitata nel prompt: la
+  guardia difensiva su `window.fbq`, necessaria perché il prompt assumeva
+  implicitamente un Pixel sempre presente — senza quella guardia, in
+  un'eventuale finestra in cui GTM non avesse ancora iniettato il Pixel al
+  momento del click, la chiamata `fbq(...)` avrebbe lanciato un errore JS
+  capace di interrompere silenziosamente il resto dello script (incluso il
+  flusso di pagamento).
+- **Verifica ordine pagato esistente (Purchase CAPI):** vedi voce separata
+  più sotto per il dettaglio — **da completare**, richiede accesso wp-admin
+  che non è stato disponibile in questa sessione.
+- **Tipo:** funzionalità (tracking) — nessun impatto su prezzi/checkout.
+- **Toccati:** `plugins/formalife-homepage/assets/js/course.js` (unico file
+  di logica toccato), `formalife-homepage.php`, `readme.txt` (v4.6.7 →
+  v4.6.8). `docs/architettura-formalife-homepage.md` §6ter (nuova sezione).
+- **Verificato:** sintassi JS (`node --check`), `php -l` sul file PHP
+  toccato (solo bump versione).
+- **Non ancora fatto:** verifica dal vivo dell'evento in Meta Events
+  Manager (serve un run reale del checkout, non eseguito in questa
+  sessione per non creare un PaymentIntent/ordine di test non necessario).
+
 ### 2026-09-11 · Pivot strategico: formalife-web al centro, questo repo diventa manutenzione WordPress
 - **Contesto:** in questa stessa sessione è emerso — analizzando il filesystem
   locale e gli altri repository GitHub dell'organizzazione — che esiste già un

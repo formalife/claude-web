@@ -116,12 +116,18 @@
 		couple.addEventListener( 'change', update ); invoiceToggle.addEventListener( 'change', setInvoice ); setInvoice(); update();
 		form.addEventListener( 'submit', function( event ){
 			event.preventDefault(); message.textContent=''; if ( ! form.reportValidity() ) { return; }
-			var button=form.querySelector('button[type="submit"]'); var clientSecret=''; button.disabled=true; button.textContent=cfg.i18n.loading;
+			var button=form.querySelector('button[type="submit"]'); var clientSecret=''; var amountCents=0; button.disabled=true; button.textContent=cfg.i18n.loading;
 			var data=new FormData(form); data.append('action',cfg.action); data.append('nonce',cfg.nonce); data.set('privacy',document.getElementById('fmh-course-privacy').checked?'1':'0'); data.set('terms',document.getElementById('fmh-course-terms').checked?'1':'0'); data.set('invoice_requested',invoiceToggle.checked?'1':'0'); appendAttribution(data);
 			fetch(cfg.ajaxUrl,{method:'POST',credentials:'same-origin',body:data})
 				.then(function(r){return r.json();})
-				.then(function(r){if(!r||!r.success||!r.data.client_secret){throw new Error(r&&r.data&&r.data.message?r.data.message:cfg.i18n.genericError);} orderId=r.data.order_id;clientSecret=r.data.client_secret;return window.FMHStripeLoader.getStripeInstance(cfg.stripePublishableKey);})
-				.then(function(instance){stripe=instance;elements=stripe.elements({clientSecret:clientSecret});elements.create('payment').mount(paymentDiv);detailsPane.hidden=true;paymentPane.hidden=false;payButton.disabled=false;})
+				.then(function(r){if(!r||!r.success||!r.data.client_secret){throw new Error(r&&r.data&&r.data.message?r.data.message:cfg.i18n.genericError);} orderId=r.data.order_id;clientSecret=r.data.client_secret;amountCents=parseInt(r.data.amount_cents,10)||0;return window.FMHStripeLoader.getStripeInstance(cfg.stripePublishableKey);})
+				.then(function(instance){stripe=instance;elements=stripe.elements({clientSecret:clientSecret});elements.create('payment').mount(paymentDiv);detailsPane.hidden=true;paymentPane.hidden=false;payButton.disabled=false;
+					// InitiateCheckout (solo browser, mai Purchase): il Payment Element è ora mostrato con un
+					// PaymentIntent reale creato dal server. Valore/valuta/content_id coerenti con il Purchase
+					// CAPI in FMH_Meta_CAPI; event_id stabile per un eventuale futuro mirror server-side, non
+					// usato per deduplicare nulla oggi (nessun InitiateCheckout CAPI esiste).
+					if(typeof window.fbq==='function'&&orderId){fbq('track','InitiateCheckout',{value:amountCents/100,currency:'EUR',content_type:'product',content_ids:['formalife-course'],content_name:'Corso Formalife',num_items:parseInt(partyInput.value,10)||1},{eventID:'fmh_initiate_checkout_'+orderId});}
+				})
 				.catch(function(error){message.textContent=error.message||cfg.i18n.genericError;button.disabled=false;button.textContent='Procedi al pagamento sicuro';});
 		} );
 		payButton.addEventListener('click',function(){if(!stripe||!elements)return;payButton.disabled=true;payButton.textContent=cfg.i18n.paying;var url=cfg.thankYouUrl+(cfg.thankYouUrl.indexOf('?')<0?'?':'&')+'order_id='+encodeURIComponent(orderId);stripe.confirmPayment({elements:elements,confirmParams:{return_url:url},redirect:'if_required'}).then(function(result){if(result.error){throw result.error;}window.location.href=url;}).catch(function(error){paymentMessage.textContent=error.message||cfg.i18n.genericError;payButton.disabled=false;payButton.textContent='Paga ora';});});

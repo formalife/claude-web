@@ -3,7 +3,7 @@ title: "Architettura — plugin formalife-homepage"
 progetto: "Formalife, Sviluppo Web & Plugin"
 tipo: "riferimento tecnico"
 status: "vivo (aggiornare ad ogni modifica strutturale)"
-versione_plugin_al: "4.6.7"
+versione_plugin_al: "4.6.8"
 ultimo_aggiornamento: "2026-09-11"
 ---
 
@@ -161,6 +161,43 @@ accettata dal solo browser.
    HMAC verificata con tolleranza 300s) — aggiorna stato ordine, consuma
    l'eventuale codice riservato, innesca l'invio Purchase a Meta CAPI.
 
+## 6ter. Tracking Meta: InitiateCheckout (browser, dalla v4.6.8) + Purchase (server, dalla v4.6.1)
+
+Questo plugin **non carica un Meta Pixel**: entrambi gli eventi dipendono da
+un Pixel già attivo in pagina per altra via (verificato dal vivo l'11/09/2026:
+`window.fbq` è una funzione sulla landing corso, iniettato da Google Tag
+Manager — non da questo plugin). Ogni punto di integrazione controlla
+`typeof window.fbq==='function'` prima di chiamare `fbq()`: se il Pixel non
+c'è, il tracking viene saltato silenziosamente, mai un errore JS che blocchi
+il checkout.
+
+- **InitiateCheckout** (`assets/js/course.js`, solo browser, mai CAPI):
+  sparato subito dopo che il Payment Element viene montato nel modale (il
+  PaymentIntent esiste già lato server a quel punto). `value`/`currency` =
+  `amount_cents` reale restituito dalla stessa risposta AJAX che crea
+  l'ordine (`class-fmh-course-orders.php` lo calcolava già da
+  `fmh_course_resolve_price_cents()` e lo restituiva nella risposta; prima
+  della v4.6.8 il JS lo ignorava semplicemente) — non un valore
+  ricalcolato lato client, quindi coerente anche con eventuali codici
+  sconto. `content_ids: ['formalife-course']`, stesso identificatore usato
+  da `FMH_Meta_CAPI::maybe_send_purchase()`. `event_id` =
+  `fmh_initiate_checkout_<order_id>`: stabile per un eventuale futuro
+  mirror server-side, ma oggi non c'è nulla con cui deduplicare (nessun
+  InitiateCheckout via CAPI).
+- **Purchase** (`includes/class-fmh-meta-capi.php`, solo server/CAPI, mai
+  browser): invariato in questa versione. Resta l'unica fonte per
+  "acquisto confermato" — vedi §5 sopra. Richiede dataset ID + access
+  token configurati e il cookie `_fbp` catturato al submit del form
+  (`appendAttribution()` in `course.js`); se manca uno dei tre, l'invio
+  viene saltato e lo stato (`sent` / `skipped_no_dataset` /
+  `skipped_no_token` / `skipped_no_fbp` / `skipped_no_amount` /
+  `error_http_<code>` / `error_wp`) è visibile nel meta box dell'ordine in
+  bacheca — vedi `class-fmh-course-orders.php::render_meta_box()`.
+
+**Non ancora fatto:** nessun mirror server-side di InitiateCheckout (non
+richiesto); verifica dal vivo in Meta Events Manager dell'evento browser
+dopo il deploy di questa versione.
+
 ## 6bis. Sicurezza alla disinstallazione (dalla v4.6.5)
 
 `uninstall.php` cancella impostazioni (`fmh_settings`, `fmh_course_settings`
@@ -185,6 +222,9 @@ non cancellerà più nulla. Spuntala solo quando l'intento è davvero smontare
 il plugin e ripulire il sito.
 
 ## 7. Changelog (sintesi — dettaglio completo in `readme.txt` del plugin)
+- **4.6.8** — Aggiunto `InitiateCheckout` (Meta Pixel, browser) alla
+  mostrazione del Payment Element nel checkout corso — vedi §6ter. Nessuna
+  modifica a UX, prezzi, checkout Stripe o Purchase CAPI.
 - **4.6.7** — Ripristinata la palette propria sulla landing/conferma corso
   (richiesta esplicita del proprietario, preferenza visiva — vedi §4bis).
   Audit di coerenza token: uniformato il fallback font tra `frontend.css` e
